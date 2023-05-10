@@ -56930,6 +56930,7 @@ $ perf report
 <p>間接消耗：多核的cache之間得共享資料。間接消耗對於程序的影響要看執行緒工作區運算元據的大小。</p>
 <p>性能分析查看Context Switches的方法</p>
 <p>Linux中可以通過工具vmstat, dstat, pidstat來觀察CS的切換情況。vmstat, dstat只能觀察整個系統的切換情況，而pidstat可以更精確地觀察某個處理程序的上下文切換情況。</p>
+<p>最常見的，在一些<a href="https://zh.wikipedia.org/wiki/%E6%8E%92%E7%A8%8B">排程</a>（scheduling）<a href="https://zh.wikipedia.org/wiki/%E7%AE%97%E6%B3%95">演算法</a>內，其中行程有時候需要暫時離開CPU，讓另一個行程進來CPU運作。在先佔式多工系統中，每一個行程都將輪流執行不定長度的時間，這些時間段落稱為<a href="https://zh.wikipedia.org/wiki/%E6%97%B6%E9%97%B4%E7%89%87">時間片</a>。如果行程並非自願讓出CPU(例如執行<a href="https://zh.wikipedia.org/wiki/I/O">I/O</a>操作時，行程就需放棄CPU使用權)，當時限到時，系統將產生一個定時中斷，<a href="https://zh.wikipedia.org/wiki/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%B5%B1">作業系統</a>將排定由其它的行程來執行。此機制用以確保CPU不致被較依賴處理器<a href="https://zh.wikipedia.org/wiki/%E8%BF%90%E7%AE%97">運算</a>的行程壟斷。若無定時中斷，除非行程自願讓出CPU，否則該行程將持續執行。對於擁有較多I/O<a href="https://zh.wikipedia.org/wiki/%E6%8C%87%E4%BB%A4">指令</a>的行程，往往執行不了多久，便需要讓出CPU；而較依賴處理器的行程相對而言I/O操作較少，反而能一直持續使用CPU，便形成了<a href="https://zh.wikipedia.org/wiki/%E7%8B%AC%E5%8D%A0">壟斷</a>現象。</p>
 <div style="break-before: page; page-break-before: always;"></div><h2 id="1天玩轉c-socket通信技術"><a class="header" href="#1天玩轉c-socket通信技術">1天玩轉c++ socket通信技術</a></h2>
 <p>socket是什麼意思
 在計算機通信領域，socket 被翻譯為“套接字”，它是計算機之間進行通信的一種約定或一種方式。通過 socket 這種約定，一臺計算機可以接收其他計算機的數據，也可以向其他計算機發送數據。</p>
