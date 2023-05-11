@@ -138,7 +138,43 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h2 id="from_order_func-做資金加減碼"><a class="header" href="#from_order_func-做資金加減碼">from_order_func 做資金加減碼</a></h2>
+                        <h2 id="multiple-assets-multiple-trade-signals-per-asset"><a class="header" href="#multiple-assets-multiple-trade-signals-per-asset">Multiple assets, multiple trade signals per asset</a></h2>
+<pre><code class="language-python">import pandas as pd
+import vectorbt as vbt
+
+price = pd.DataFrame({&quot;p1&quot;: [1, 2, 3, 4], &quot;p2&quot;: [5, 6, 7, 8]})
+price.columns.name = &quot;asset&quot;
+entries = pd.DataFrame(
+    {
+        &quot;en1&quot;: [True, False, False, False],
+        &quot;en2&quot;: [False, True, False, False],
+        &quot;en3&quot;: [False, False, True, False],
+        &quot;en4&quot;: [False, False, False, True],
+    }
+)
+entries.columns.name = &quot;entries&quot;
+exits = pd.DataFrame(
+    {
+        &quot;ex1&quot;: [False, False, False, True],
+        &quot;ex2&quot;: [False, False, False, True],
+        &quot;ex3&quot;: [False, False, False, True],
+        &quot;ex4&quot;: [False, False, False, True],
+    }
+)
+exits.columns.name = &quot;exits&quot;
+entries = entries.vbt.stack_index(pd.Index([&quot;p1&quot;, &quot;p1&quot;, &quot;p2&quot;, &quot;p2&quot;], name=&quot;asset&quot;))
+exits = exits.vbt.stack_index(pd.Index([&quot;p1&quot;, &quot;p1&quot;, &quot;p2&quot;, &quot;p2&quot;], name=&quot;asset&quot;))
+portfolio = vbt.Portfolio.from_signals(price, entries, exits)  # not grouped portfolio
+print(portfolio.total_return())
+print(portfolio.total_return(group_by='asset'))  # group not grouped portfolio
+
+portfolio = vbt.Portfolio.from_signals(price, entries, exits, group_by='asset')  # grouped portfolio
+print(portfolio.total_return())
+
+print(portfolio.total_return(group_by=False))  # ungroup grouped portfolio
+
+</code></pre>
+<h2 id="from_order_func-做資金加減碼"><a class="header" href="#from_order_func-做資金加減碼">from_order_func 做資金加減碼</a></h2>
 <pre><code class="language-python">from numba import njit
 from vectorbt.portfolio import nb
 from vectorbt.portfolio.enums import Direction
