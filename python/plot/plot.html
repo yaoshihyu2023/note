@@ -328,6 +328,104 @@ fig3.update_layout(xaxis_rangeslider_visible=False)  #hide range slider
 show_plot(fig3, 'test.html')
 
 </code></pre>
+<h2 id="easy-and-interactive-candlestick-charts-in-python"><a class="header" href="#easy-and-interactive-candlestick-charts-in-python">Easy and Interactive Candlestick Charts in Python</a></h2>
+<p>https://medium.com/@dannygrovesn7/using-streamlit-and-plotly-to-create-interactive-candlestick-charts-a2a764ad0d8e</p>
+<pre><code class="language-python">import pandas as pd
+import yfinance as yf
+import plotly.io as pio
+import plotly.graph_objects as go
+import plotly as plotly
+from plotly.subplots import make_subplots
+
+pio.renderers.default = &quot;browser&quot;
+
+
+def get_candlestick_plot(df: pd.DataFrame, ma1: int, ma2: int, ticker: str):
+    &quot;&quot;&quot;
+    Create the candlestick chart with two moving avgs + a plot of the volume
+    Parameters
+    ----------
+    df : pd.DataFrame
+        The price dataframe
+    ma1 : int
+        The length of the first moving average (days)
+    ma2 : int
+        The length of the second moving average (days)
+    ticker : str
+        The ticker we are plotting (for the title).
+    &quot;&quot;&quot;
+
+    fig = make_subplots(
+        rows=2,
+        cols=1,
+        shared_xaxes=True,
+        vertical_spacing=0.1,
+        subplot_titles=(f&quot;{ticker} Stock Price&quot;, &quot;Volume Chart&quot;),
+        row_width=[0.3, 0.7],
+    )
+
+    fig.add_trace(
+        go.Candlestick(
+            # x=df[&quot;Date&quot;],
+            x=df.index,
+            open=df[&quot;Open&quot;],
+            high=df[&quot;High&quot;],
+            low=df[&quot;Low&quot;],
+            close=df[&quot;Close&quot;],
+            name=&quot;Candlestick chart&quot;,
+        ),
+        row=1,
+        col=1,
+    )
+
+    fig.add_trace(
+        go.Line(x=df.index, y=df[f&quot;{ma1}_ma&quot;], name=f&quot;{ma1} SMA&quot;),
+        row=1,
+        col=1,
+    )
+
+    fig.add_trace(
+        go.Line(x=df.index, y=df[f&quot;{ma2}_ma&quot;], name=f&quot;{ma2} SMA&quot;),
+        row=1,
+        col=1,
+    )
+
+    fig.add_trace(
+        go.Bar(x=df.index, y=df[&quot;Volume&quot;], name=&quot;Volume&quot;),
+        row=2,
+        col=1,
+    )
+
+    fig[&quot;layout&quot;][&quot;xaxis2&quot;][&quot;title&quot;] = &quot;Date&quot;
+    fig[&quot;layout&quot;][&quot;yaxis&quot;][&quot;title&quot;] = &quot;Price&quot;
+    fig[&quot;layout&quot;][&quot;yaxis2&quot;][&quot;title&quot;] = &quot;Volume&quot;
+
+    fig.update_xaxes(
+        rangebreaks=[{&quot;bounds&quot;: [&quot;sat&quot;, &quot;mon&quot;]}],
+        rangeslider_visible=False,
+    )
+
+    return fig
+
+
+def show_plot(fig, filename):
+    plotly.offline.plot(fig, filename=filename)
+
+
+if __name__ == &quot;__main__&quot;:
+    tsla = yf.Ticker(&quot;TSLA&quot;)
+    df = tsla.history(period=&quot;1y&quot;)
+
+    df[&quot;10_ma&quot;] = df[&quot;Close&quot;].rolling(10).mean()
+    df[&quot;20_ma&quot;] = df[&quot;Close&quot;].rolling(20).mean()
+    print(df, df[-120:])
+    input()
+
+    fig = get_candlestick_plot(df[-120:], 10, 20, &quot;TSLA&quot;)
+    # fig.show()
+    show_plot(fig, &quot;tsla.html&quot;)
+
+</code></pre>
 
                         <script src="https://utteranc.es/client.js"
                             repo="imxood/imxood.github.io"
