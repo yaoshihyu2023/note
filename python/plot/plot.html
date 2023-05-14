@@ -413,18 +413,15 @@ def show_plot(fig, filename):
 
 
 if __name__ == &quot;__main__&quot;:
-    tsla = yf.Ticker(&quot;TSLA&quot;)
-    df = tsla.history(period=&quot;1y&quot;)
+    stock = &quot;2630.TW&quot;
+    tsla = yf.Ticker(stock)
+    df = tsla.history(period=&quot;10y&quot;)
 
     df[&quot;10_ma&quot;] = df[&quot;Close&quot;].rolling(10).mean()
     df[&quot;20_ma&quot;] = df[&quot;Close&quot;].rolling(20).mean()
-    print(df, df[-120:])
-    input()
-
-    fig = get_candlestick_plot(df[-120:], 10, 20, &quot;TSLA&quot;)
+    fig = get_candlestick_plot(df[-120:], 10, 20, stock)
     # fig.show()
     show_plot(fig, &quot;tsla.html&quot;)
-
 </code></pre>
 
                         <script src="https://utteranc.es/client.js"

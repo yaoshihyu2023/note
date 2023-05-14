@@ -50842,18 +50842,15 @@ def show_plot(fig, filename):
 
 
 if __name__ == &quot;__main__&quot;:
-    tsla = yf.Ticker(&quot;TSLA&quot;)
-    df = tsla.history(period=&quot;1y&quot;)
+    stock = &quot;2630.TW&quot;
+    tsla = yf.Ticker(stock)
+    df = tsla.history(period=&quot;10y&quot;)
 
     df[&quot;10_ma&quot;] = df[&quot;Close&quot;].rolling(10).mean()
     df[&quot;20_ma&quot;] = df[&quot;Close&quot;].rolling(20).mean()
-    print(df, df[-120:])
-    input()
-
-    fig = get_candlestick_plot(df[-120:], 10, 20, &quot;TSLA&quot;)
+    fig = get_candlestick_plot(df[-120:], 10, 20, stock)
     # fig.show()
     show_plot(fig, &quot;tsla.html&quot;)
-
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h2 id="pyo3"><a class="header" href="#pyo3">PyO3</a></h2>
 <pre><code class="language-shell">https://github.com/PyO3/pyo3
