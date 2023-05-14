@@ -64333,7 +64333,8 @@ if __name__ == &quot;__main__&quot;:
 
     merged_df = close.merge(rev, on='date', how='left', suffixes=('_close', '_rev'))
     merged_df.fillna(method='bfill', inplace=True)
-    print(merged_df)
+    print(merged_df, merged_df.columns)
+    print(merged_df['2330_close'], merged_df['2330_rev'])
 </code></pre>
 <h2 id="臺股漲跌與市值板塊圖"><a class="header" href="#臺股漲跌與市值板塊圖">臺股漲跌與市值板塊圖</a></h2>
 <p>出處: https://www.finlab.tw/dashboard2-plotly-treemap/</p>
