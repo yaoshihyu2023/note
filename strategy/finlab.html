@@ -138,7 +138,25 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h2 id="臺股漲跌與市值板塊圖"><a class="header" href="#臺股漲跌與市值板塊圖">臺股漲跌與市值板塊圖</a></h2>
+                        <h2 id="收盤價跟月營收合併"><a class="header" href="#收盤價跟月營收合併">收盤價跟月營收合併</a></h2>
+<pre><code class="language-python">import finlab
+import pandas as pd
+from finlab import data
+
+pd.options.display.float_format = lambda x: &quot;%.2f&quot; % x
+
+
+if __name__ == &quot;__main__&quot;:
+    close = data.get(&quot;price:收盤價&quot;)
+    rev = data.get(&quot;monthly_revenue:當月營收&quot;)
+    print(close)
+    print(rev)
+
+    merged_df = close.merge(rev, on='date', how='left', suffixes=('_close', '_rev'))
+    merged_df.fillna(method='bfill', inplace=True)
+    print(merged_df)
+</code></pre>
+<h2 id="臺股漲跌與市值板塊圖"><a class="header" href="#臺股漲跌與市值板塊圖">臺股漲跌與市值板塊圖</a></h2>
 <p>出處: https://www.finlab.tw/dashboard2-plotly-treemap/</p>
 <pre><code class="language-python">import pandas as pd
 import numpy as np
