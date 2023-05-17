@@ -5464,6 +5464,7 @@ docker start -i docker_test
 docker stop docker_test
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="docker-教學"><a class="header" href="#docker-教學">Docker 教學</a></h1>
+<p><strong><em>docker</em>實際上,就是一個系統聯合幾個元件一直在欺騙一個處理程序,主要依靠了三個幫凶namespace,<em>chroot,cgroup</em></strong> </p>
 <p>Containers as a Service ( CaaS ) - 容器如同服務
 Docker 是一個開源專案，出現於 2013 年初，最初是 Dotcloud 公司內部的 Side-Project。
 它基於 Google 公司推出的 Go 語言實作。（ Dotcloud 公司後來改名為 Docker ）</p>
@@ -58284,12 +58285,14 @@ root     3833    10.0     0.1           62820        2580   pts/9    R     11:56
 </code></pre>
 <p>說明測試程序的CPU使用率已經被成功限制在10%以內，而記憶體佔用不會超過50MB。</p>
 <h2 id="limit-chrome"><a class="header" href="#limit-chrome">limit chrome</a></h2>
-<pre><code class="language-sh"># Create a new cgroup called `limitchrome` accessible by your user
+<pre><code class="language-sh">sudo chmod o+w /sys/fs/cgroup/cgroup.procs
+
+
 sudo cgcreate -t $USER:$USER -a $USER:$USER  -g memory,cpuset:limitchrome
 # Limit RAM to 1.5G roughly
-echo 1600000000 | sudo tee /sys/fs/cgroup/memory/limitchrome/memory.limit_in_bytes
-# Limit to CPUs 0 and 1 only
-echo 0-1 | sudo tee /sys/fs/cgroup/cpuset/limitchrome/cpuset.cpus
+echo 1600000000 | sudo tee /sys/fs/cgroup/limitchrome/memory.limit_in_bytes
+
+echo 0-4 | sudo tee /sys/fs/cgroup/limitchrome/cpuset.cpus
 # Run chrome in this cgroup
 cgexec -g memory,cpuset:limitchrome /opt/google/chrome/google-chrome --profile-directory=Default
 # Delete the cgroup (not required)
