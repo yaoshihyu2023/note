@@ -281,7 +281,7 @@ BENCHMARK(bench_linked_queue_insert_int_10);
 }
 BENCHMARK(bench_array_ring_insert_int)-&gt;Arg(10);
 </code></pre>
-<p>上面的例子展示了如何傳遞和獲取參數：</p>
+<p>上面的例子展示瞭如何傳遞和獲取參數：</p>
 <ol>
 <li>傳遞參數使用<code>BENCHMARK</code>宏生成的對象的<code>Arg</code>方法</li>
 <li>傳遞進來的參數會被放入state對象內部儲存，通過<code>range</code>方法獲取，呼叫時的參數0是傳入參數的需要，對應第一個參數</li>

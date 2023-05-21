@@ -3798,7 +3798,7 @@ BENCHMARK(bench_linked_queue_insert_int_10);
 }
 BENCHMARK(bench_array_ring_insert_int)-&gt;Arg(10);
 </code></pre>
-<p>上面的例子展示了如何傳遞和獲取參數：</p>
+<p>上面的例子展示瞭如何傳遞和獲取參數：</p>
 <ol>
 <li>傳遞參數使用<code>BENCHMARK</code>宏生成的對象的<code>Arg</code>方法</li>
 <li>傳遞進來的參數會被放入state對象內部儲存，通過<code>range</code>方法獲取，呼叫時的參數0是傳入參數的需要，對應第一個參數</li>
@@ -4881,23 +4881,23 @@ int main()
 <p>如果是為了提高性能將程序大幅改寫成無鎖程式設計，一般來說結果可能會讓我們失望，而且無鎖程式設計裡面需要注意的地方也非常多，比如ABA問題，記憶體順序問題，正確實現無鎖程式設計比實現有鎖程式設計要困難很多，除非有必要（確定了性能瓶頸）才去考慮使用無鎖程式設計，否則還是使用互斥鎖更好，畢竟程序的高性能是建立在程序正確性的基礎上，如果程序不正確，一切性能提升都是徒勞無功。</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="c-為核心語言的高頻交易系統是如何做到低延遲"><a class="header" href="#c-為核心語言的高頻交易系統是如何做到低延遲">C++ 為核心語言的高頻交易系統是如何做到低延遲？</a></h1>
 <p>出處：https://kknews.cc/tech/bozorm9.amp</p>
-<p>問題中限定語言是C++，可討論的範圍就比較精簡了。現有的答案都在談系統架構層次上的東西，略顯跑題。我對C++了解不多，但我嘗試以一名C++程式設計師的視角，從基本思路出發做一個分析，拋磚引玉。</p>
+<p>問題中限定語言是C++，可討論的範圍就比較精簡了。現有的答案都在談系統架構層次上的東西，略顯跑題。我對C++瞭解不多，但我嘗試以一名C++程式設計師的視角，從基本思路出發做一個分析，拋磚引玉。</p>
 <p>首先我們要明確係統的需求。所謂交易系統，從一個應用程式的角度來說，有以下幾個特點：</p>
 <ol>
-<li>一定是一個網絡相關的應用，假如機器沒聯網，肯定什麼交易也幹不了。所以系統需要通過TCP/IP連接來收發數據。數據要分兩種，一種從交易所發過來的市場數據，流量很大，另一種是系統向交易所發出的交易指令，相比前者流量很小，這兩種數據需要在不同的TCP/IP連接里傳輸。</li>
-<li>因為是自動化交易系統，人工干預的部分肯定比較小，所以圖形界面不是重點。而為了性能考慮，圖形界面需要和後台分開部署在不同的機器上，通過網絡交互，以免任何圖形界面上的問題導致後台系統故障或者被搶占資源。這樣又要在後台增加新的TCP/IP連接。</li>
-<li>高頻交易系統對延遲異常敏感，目前（2014）市面上的主流系統（可以直接買到的大眾系統）延遲至少在100微秒級別，頂尖的系統（HFT專有）可以做到10微秒以下。其他答案里提到C++隨便寫寫延遲做到幾百微秒，是肯定不行的，這樣的性能對於高頻交易來說會是一場災難。</li>
+<li>一定是一個網絡相關的應用，假如機器沒聯網，肯定什麼交易也幹不了。所以系統需要通過TCP/IP連接來收發數據。數據要分兩種，一種從交易所發過來的市場數據，流量很大，另一種是系統向交易所發出的交易指令，相比前者流量很小，這兩種數據需要在不同的TCP/IP連接裡傳輸。</li>
+<li>因為是自動化交易系統，人工幹預的部分肯定比較小，所以圖形界面不是重點。而為了性能考慮，圖形界面需要和後臺分開部署在不同的機器上，通過網絡交互，以免任何圖形界面上的問題導致後臺系統故障或者被搶佔資源。這樣又要在後臺增加新的TCP/IP連接。</li>
+<li>高頻交易系統對延遲異常敏感，目前（2014）市面上的主流系統（可以直接買到的大眾系統）延遲至少在100微秒級別，頂尖的系統（HFT專有）可以做到10微秒以下。其他答案裡提到C++隨便寫寫延遲做到幾百微秒，是肯定不行的，這樣的性能對於高頻交易來說會是一場災難。</li>
 <li>系統只需要專注於處理自己收到的數據，不需要和其他機器合作，不需要擔心流量過載。</li>
 </ol>
 <p>有了以上幾點基本的認識，我們可以看看用C++做為開發語言有哪些需要注意的。</p>
-<p>首先前兩點需求就決定了，這種系統一定是一個多線程程序。雖然對於圖形界面來說，後台系統相當於一個服務端，但這部分的性能不是重點，用常用的模式就能解決。而重要的面向交易所那端，系統其實是一個客戶端程序，只需要維護好固定數量的連接就可以了。為延遲考慮，一定要選擇異步I/O（阻塞的同步I/O會消耗時間在上下文切換），這裡有兩點需要注意：</p>
+<p>首先前兩點需求就決定了，這種系統一定是一個多線程程序。雖然對於圖形界面來說，後臺系統相當於一個服務端，但這部分的性能不是重點，用常用的模式就能解決。而重要的面向交易所那端，系統其實是一個客戶端程序，只需要維護好固定數量的連接就可以了。為延遲考慮，一定要選擇異步I/O（阻塞的同步I/O會消耗時間在上下文切換），這裡有兩點需要注意：</p>
 <ul>
 <li>是否可以在單線程內完成所有處理？考慮市場數據的流量遠遠高於發出的交易指令，在單線程內處理顯然是不行的，否則可能收了一大堆數據還沒開始處理，錯過了發指令的最佳時機。</li>
 <li>有答案提到要壓低平時的資源使用率，這是完全錯誤的設計思路。問題同樣出在上下文切換上，一旦系統進入IDLE狀態，再重新切換回處理模式是要付出時間代價的。正確的做法是保持對異步socket的瘋狂輪詢，一旦有消息就立刻處理，之後繼續輪詢，這樣是最快的處理方式。（順帶一提現在的CPU一般會帶有環保功能，使用率低了會導致CPU進入低功耗模式，同樣對性能有嚴重影響。真正的低延遲系統一定是永遠發燙的！）</li>
 </ul>
-<p>現在我們知道核心的模塊是一個多線程的，處理多個TCP/IP連接的模塊，接下來就可以針對C++進行討論。因為需要對接受到的每個TCP或UDP包進行處理，首先要考慮的是如何把包從接收線程傳遞給處理線程。我們知道C++是面向對象的語言，一般情況下最直觀的思路是創建一個對象，然後發給處理線程，這樣從邏輯上看是非常清晰的。但在追求低延遲的系統里不能這樣做，因為對象是分配在堆上的，而堆的內存結構對我們來說是完全不透明的，沒辦法控制一個對象會具體分到內存的什麼位置上，這直接導致的問題是本來連續收到的網絡包，在內存里的分布是分散的，當處理線程需要讀取數據時就會發生大量的cache miss，產生不可控的延遲。所以對C++開發者來說，第一條需要謹記的應該是，不要隨便使用堆（用關鍵字new）。核心的數據要保證分配在連續內存里。</p>
+<p>現在我們知道核心的模塊是一個多線程的，處理多個TCP/IP連接的模塊，接下來就可以針對C++進行討論。因為需要對接受到的每個TCP或UDP包進行處理，首先要考慮的是如何把包從接收線程傳遞給處理線程。我們知道C++是面向對象的語言，一般情況下最直觀的思路是創建一個對象，然後發給處理線程，這樣從邏輯上看是非常清晰的。但在追求低延遲的系統裡不能這樣做，因為對象是分配在堆上的，而堆的內存結構對我們來說是完全不透明的，沒辦法控制一個對象會具體分到內存的什麼位置上，這直接導致的問題是本來連續收到的網絡包，在內存裡的分佈是分散的，當處理線程需要讀取數據時就會發生大量的cache miss，產生不可控的延遲。所以對C++開發者來說，第一條需要謹記的應該是，不要隨便使用堆（用關鍵字new）。核心的數據要保證分配在連續內存裡。</p>
 <p>另一個問題在於，市場數據和交易指令都是結構化的，包含了股票名稱，價格，時間等一系列信息。如果使用C++ class來對數據進行建模和封裝，同樣會產生不可知的內存結構。為了嚴格控制內存結構，應該使用struct來封裝。一方面在對接收到的數據解析時可以直接定義名稱，一方面在分配新對象（比如交易指令）時可以保證所有數據都分配在連續的內存區域。</p>
-<p>以上兩點是關於延遲方面最重要的注意事項。除此之外，需要考慮的是業務邏輯的編寫。高頻交易系統里註定了業務邏輯不會太複雜，但重要的是要保證正確性和避免指針錯誤。正確性應該可以藉助於C++的特性比如強類型，模板等來加強驗證，這方面我不熟悉就不多說了。高頻系統往往運行時要處理大量訂單，所以一定要保證系統運行時不能崩潰，一旦coredump後果很嚴重。這個問題也許可以多做編譯期靜態分析來加強，或者需要在系統外增加安全機制，這裡不展開討論了。</p>
+<p>以上兩點是關於延遲方面最重要的注意事項。除此之外，需要考慮的是業務邏輯的編寫。高頻交易系統裡註定了業務邏輯不會太複雜，但重要的是要保證正確性和避免指針錯誤。正確性應該可以藉助於C++的特性比如強類型，模板等來加強驗證，這方面我不熟悉就不多說了。高頻系統往往運行時要處理大量訂單，所以一定要保證系統運行時不能崩潰，一旦coredump後果很嚴重。這個問題也許可以多做編譯期靜態分析來加強，或者需要在系統外增加安全機制，這裡不展開討論了。</p>
 <p>以下是幾點引申思考：</p>
 <ul>
 <li>如何存儲系統日誌？</li>
@@ -4905,7 +4905,7 @@ int main()
 <li>如果系統coredump，事後如何分析找出問題所在？</li>
 <li>如何設計保證系統可用性，使得出現coredump之類的情況時可以及時切換到備用系統？</li>
 </ul>
-<p>這些問題相信在C++框架內都有合適的解決方案，我對此了解不多，所以只列在這裡供大家討論。</p>
+<p>這些問題相信在C++框架內都有合適的解決方案，我對此瞭解不多，所以只列在這裡供大家討論。</p>
 <div style="break-before: page; page-break-before: always;"></div><h2 id="risc-v-指令集分析"><a class="header" href="#risc-v-指令集分析">RISC-V 指令集分析</a></h2>
 <p>出處：https://ithelp.ithome.com.tw/articles/10257457</p>
 <p>有了基本檔案架構後，開始動工指令的部分。RISC-V將指令分成數個子集，其中包括RV32I、RV32E、RV64I、RV128I四套整數指令集，以及約14套擴充指令集，雖然號稱&quot;精簡&quot;，最基本的RV32I指令集也有47條指令，實作的effort也是不小。為了能有的放矢的進行實作，目前打算先以實際編譯出來最常用的指令開始處理。</p>
@@ -5464,7 +5464,7 @@ docker start -i docker_test
 docker stop docker_test
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="docker-教學"><a class="header" href="#docker-教學">Docker 教學</a></h1>
-<p><strong><em>docker</em>實際上,就是一個系統聯合幾個元件一直在欺騙一個處理程序,主要依靠了三個幫凶namespace,<em>chroot,cgroup</em></strong> </p>
+<p><strong><em>docker</em>實際上,就是一個系統聯合幾個元件一直在欺騙一個處理程序,主要依靠了三個幫兇namespace,<em>chroot,cgroup</em></strong> </p>
 <p>Containers as a Service ( CaaS ) - 容器如同服務
 Docker 是一個開源專案，出現於 2013 年初，最初是 Dotcloud 公司內部的 Side-Project。
 它基於 Google 公司推出的 Go 語言實作。（ Dotcloud 公司後來改名為 Docker ）</p>
@@ -9092,7 +9092,7 @@ stable-x86_64-unknown-linux-gnu
 <li><a href="https://shihyu.github.io/RustPrimerBook/">RustPrimer繁體</a></li>
 <li><a href="https://skyao.io/learning-rust/">Rust學習筆記</a></li>
 <li><a href="https://weathfold.gitbooks.io/rust-too-many-lists-zhcn/content/">通過大量的鏈表學習Rust</a></li>
-<li><a href="https://shihyu.github.io/rust_hacks/">Rust入門祕籍</a></li>
+<li><a href="https://shihyu.github.io/rust_hacks/">Rust入門秘籍</a></li>
 <li><a href="https://ithelp.ithome.com.tw/users/20129675/ironman/4260?page=1">Rust 新手村 系列</a></li>
 <li><a href="https://ithelp.ithome.com.tw/users/20111802/ironman/1742">30 天深入淺出 Rust 系列</a></li>
 <li><a href="https://ithelp.ithome.com.tw/users/20120293/ironman/5180">30 天快快樂樂學 Rust 系列</a></li>
@@ -43537,7 +43537,7 @@ ch &lt;- &quot;EDDYCJY&quot;
 <p><img src="https://codertw.com/wp-content/uploads/img/6dQ43Z54mk.jpg" alt="Golang大殺器之跟蹤剖析trace" /></p>
 <p>通過對以上三項的跟蹤分析，加上這個洩露，這個阻塞的耗時，這個涉及的內部方法名，很明顯就是哪位又忘記關閉客戶端連接了，趕緊改改改。</p>
 <h2 id="總結-5"><a class="header" href="#總結-5">總結</a></h2>
-<p>通過本文我們習得了 <code>go tool trace</code> 的武林祕籍，它能夠跟蹤捕獲各種執行中的事件，例如 Goroutine 的創建/阻塞/解除阻塞，Syscall 的進入/退出/阻止，GC 事件，Heap 的大小改變，Processor 啟動/停止等等。</p>
+<p>通過本文我們習得了 <code>go tool trace</code> 的武林秘籍，它能夠跟蹤捕獲各種執行中的事件，例如 Goroutine 的創建/阻塞/解除阻塞，Syscall 的進入/退出/阻止，GC 事件，Heap 的大小改變，Processor 啟動/停止等等。</p>
 <p>希望你能夠用好 Go 的兩大殺器 pprof + trace 組合，此乃排查好搭檔，誰用誰清楚，即使他並不萬能。</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="程序進程執行緒線程協程傻傻分得清楚"><a class="header" href="#程序進程執行緒線程協程傻傻分得清楚">程序(進程)、執行緒(線程)、協程，傻傻分得清楚！</a></h1>
 <p>要成為一個優秀的軟體工程師，進程（process）、線程（thread）是一定要搞懂與掌握的知識點，不僅是因為它們是電腦科學根本的知識，更是因為懂得在適當的時機善用它們，可以增進程式的執行效率，也就是提升效能。</p>
@@ -53411,7 +53411,7 @@ black = &quot;^22.3.0&quot;
 <h3 id="強烈建議善用-dev-dependencies"><a class="header" href="#強烈建議善用-dev-dependencies">強烈建議：善用 dev-dependencies</a></h3>
 <p>善用<code>-D</code>參數，明確區分<strong>開發環境專用</strong>的套件，我認為<strong>非常必要</strong>。</p>
 <p>首先，這些套件常常屬於「<strong>檢測型</strong>」工具，相關的<strong>依賴套件</strong>著實不少！比如<code>flake8</code>，它依賴了<code>pycodestyle</code>、<code>pyflakes</code>、<code>mccabe</code>等等，還有<code>black</code>、<code>pre-commit</code>，依賴套件數量也都很可觀。</p>
-<p>其次，既然它們都只在開發階段才需要，則完全可以從部署環境中<strong>缺席</strong>。如果不分青紅皁白一律安裝到<code>dependencies</code>區塊，部署環境容易顯得過於<strong>臃腫</strong>。</p>
+<p>其次，既然它們都只在開發階段才需要，則完全可以從部署環境中<strong>缺席</strong>。如果不分青紅皂白一律安裝到<code>dependencies</code>區塊，部署環境容易顯得過於<strong>臃腫</strong>。</p>
 <p>常見的<code>dev-dependencies</code>區塊項目，例示如下：</p>
 <pre><code>[tool.poetry.dev-dependencies]
 flake8 = &quot;4.0.1&quot;
@@ -56977,9 +56977,9 @@ Crash --&gt; [*]
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="linux-效能分析工具-perf"><a class="header" href="#linux-效能分析工具-perf">Linux 效能分析工具: Perf</a></h1>
 <h2 id="簡介-1"><a class="header" href="#簡介-1">簡介</a></h2>
-<p><a href="https://perf.wiki.kernel.org/index.php/Main_Page">Perf</a> 全名是 Performance Event，是在 Linux 2.6.31 以後內建的系統效能分析工具，它隨著核心一併釋出。藉由 perf，應用程式可以利用 PMU (Performance Monitoring Unit), tracepoint 和核心內部的特殊計數器 (counter) 來進行統計，另外還能同時分析運行中的核心程式碼，從而更全面了解應用程式中的效能瓶頸。</p>
+<p><a href="https://perf.wiki.kernel.org/index.php/Main_Page">Perf</a> 全名是 Performance Event，是在 Linux 2.6.31 以後內建的系統效能分析工具，它隨著核心一併釋出。藉由 perf，應用程式可以利用 PMU (Performance Monitoring Unit), tracepoint 和核心內部的特殊計數器 (counter) 來進行統計，另外還能同時分析運行中的核心程式碼，從而更全面瞭解應用程式中的效能瓶頸。</p>
 <p>相較於 <a href="https://en.wikipedia.org/wiki/OProfile">OProfile</a> 和 <a href="https://sourceware.org/binutils/docs/gprof/">GProf</a> ，perf 的優勢在於與 Linux Kernel 緊密結合，並可受益於最先納入核心的新特徵。perf 基本原理是對目標進行取樣，紀錄特定的條件下所偵測的事件是否發生以及發生的次數。例如根據 tick 中斷進行取樣，即在 tick 中斷內觸發取樣點，在取樣點裡判斷行程 (process) 當時的 context。假如一個行程 90% 的時間都花費在函式 foo() 上，那麼 90% 的取樣點都應該落在函式 foo() 的上下文中。</p>
-<p>Perf 可取樣的事件非常多，可以分析 Hardware event，如 cpu-cycles、instructions 、cache-misses、branch-misses …等等。可以分析 Software event，如 page-faults、context-switches …等等，另外一種就是 Tracepoint event。知道了 cpu-cycles、instructions 我們可以了解 Instruction per cycle 是多少，進而判斷程式碼有沒有好好利用 CPU，cache-misses 可以曉得是否有善用 Locality of reference ，branch-misses 多了是否導致嚴重的 pipeline hazard？另外 Perf 還可以對函式進行採樣，了解效能卡在哪邊。</p>
+<p>Perf 可取樣的事件非常多，可以分析 Hardware event，如 cpu-cycles、instructions 、cache-misses、branch-misses …等等。可以分析 Software event，如 page-faults、context-switches …等等，另外一種就是 Tracepoint event。知道了 cpu-cycles、instructions 我們可以瞭解 Instruction per cycle 是多少，進而判斷程式碼有沒有好好利用 CPU，cache-misses 可以曉得是否有善用 Locality of reference ，branch-misses 多了是否導致嚴重的 pipeline hazard？另外 Perf 還可以對函式進行採樣，瞭解效能卡在哪邊。</p>
 <h2 id="安裝-3"><a class="header" href="#安裝-3">安裝</a></h2>
 <p>首先利用以下指令查看目前的 Kernel config 有沒有啟用 Perf。如果 PC 上是裝一般 Linux distro，預設值應該都有開啟。</p>
 <pre><code class="language-sh">＄ cat &quot;/boot/config-`uname -r`&quot; | grep &quot;PERF_EVENT&quot;
@@ -57055,7 +57055,7 @@ g++ perf_top_example.o -o example
 <h2 id="背景知識"><a class="header" href="#背景知識">背景知識</a></h2>
 <p>以下節錄上海交大通信與電子工程系的劉明寫的文章：</p>
 <p><a href="https://www.ibm.com/developerworks/cn/linux/l-cn-perf1/">Perf – Linux下的系統性能調優工具</a></p>
-<p><a href="https://zh.wikipedia.org/zh-tw/Wikipedia:%E7%B9%81%E7%AE%80%E5%88%86%E6%AD%A7%E8%AF%8D%E8%A1%A8#.E7.A7.91.E6.8A.80">簡繁體中文詞彙對照：科技纇</a> (本課程斟酌修改詞彙，<code>==&gt;</code> 開頭表示補充)</p>
+<p><a href="https://zh.wikipedia.org/zh-tw/Wikipedia:%E7%B9%81%E7%B0%A1%E5%88%86%E6%AD%A7%E8%A9%9E%E8%A1%A8#.E7.A7.91.E6.8A.80">簡繁體中文詞彙對照：科技纇</a> (本課程斟酌修改詞彙，<code>==&gt;</code> 開頭表示補充)</p>
 <ul>
 <li><strong>背景知識</strong></li>
 </ul>
@@ -57130,7 +57130,7 @@ g++ perf_top_example.o -o example
 <pre><code>$ perf top -e cache-misses -c 5000
 </code></pre>
 <h3 id="perf-stat"><a class="header" href="#perf-stat">perf stat</a></h3>
-<p>相較於 top，使用 perf stat 往往是你已經有個要優化的目標，對這個目標進行特定或一系列的 event 檢查，進而了解該程序的效能概況。（event 沒有指定的話，預設會有十種常用 event。） 我們來對以下程式使用 perf stat 工具 分析 cache miss 情形</p>
+<p>相較於 top，使用 perf stat 往往是你已經有個要優化的目標，對這個目標進行特定或一系列的 event 檢查，進而瞭解該程序的效能概況。（event 沒有指定的話，預設會有十種常用 event。） 我們來對以下程式使用 perf stat 工具 分析 cache miss 情形</p>
 <pre><code class="language-c">static char array[10000][10000];
 int main (void){
   int i, j;
@@ -57218,7 +57218,7 @@ $ perf report
 <p>間接消耗：多核的cache之間得共享資料。間接消耗對於程序的影響要看執行緒工作區運算元據的大小。</p>
 <p>性能分析查看Context Switches的方法</p>
 <p>Linux中可以通過工具vmstat, dstat, pidstat來觀察CS的切換情況。vmstat, dstat只能觀察整個系統的切換情況，而pidstat可以更精確地觀察某個處理程序的上下文切換情況。</p>
-<p>最常見的，在一些<a href="https://zh.wikipedia.org/wiki/%E6%8E%92%E7%A8%8B">排程</a>（scheduling）<a href="https://zh.wikipedia.org/wiki/%E7%AE%97%E6%B3%95">演算法</a>內，其中行程有時候需要暫時離開CPU，讓另一個行程進來CPU運作。在先佔式多工系統中，每一個行程都將輪流執行不定長度的時間，這些時間段落稱為<a href="https://zh.wikipedia.org/wiki/%E6%97%B6%E9%97%B4%E7%89%87">時間片</a>。如果行程並非自願讓出CPU(例如執行<a href="https://zh.wikipedia.org/wiki/I/O">I/O</a>操作時，行程就需放棄CPU使用權)，當時限到時，系統將產生一個定時中斷，<a href="https://zh.wikipedia.org/wiki/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%B5%B1">作業系統</a>將排定由其它的行程來執行。此機制用以確保CPU不致被較依賴處理器<a href="https://zh.wikipedia.org/wiki/%E8%BF%90%E7%AE%97">運算</a>的行程壟斷。若無定時中斷，除非行程自願讓出CPU，否則該行程將持續執行。對於擁有較多I/O<a href="https://zh.wikipedia.org/wiki/%E6%8C%87%E4%BB%A4">指令</a>的行程，往往執行不了多久，便需要讓出CPU；而較依賴處理器的行程相對而言I/O操作較少，反而能一直持續使用CPU，便形成了<a href="https://zh.wikipedia.org/wiki/%E7%8B%AC%E5%8D%A0">壟斷</a>現象。</p>
+<p>最常見的，在一些<a href="https://zh.wikipedia.org/wiki/%E6%8E%92%E7%A8%8B">排程</a>（scheduling）<a href="https://zh.wikipedia.org/wiki/%E7%AE%97%E6%B3%95">演算法</a>內，其中行程有時候需要暫時離開CPU，讓另一個行程進來CPU運作。在先佔式多工系統中，每一個行程都將輪流執行不定長度的時間，這些時間段落稱為<a href="https://zh.wikipedia.org/wiki/%E6%99%82%E9%96%93%E7%89%87">時間片</a>。如果行程並非自願讓出CPU(例如執行<a href="https://zh.wikipedia.org/wiki/I/O">I/O</a>操作時，行程就需放棄CPU使用權)，當時限到時，系統將產生一個定時中斷，<a href="https://zh.wikipedia.org/wiki/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%B5%B1">作業系統</a>將排定由其它的行程來執行。此機制用以確保CPU不致被較依賴處理器<a href="https://zh.wikipedia.org/wiki/%E9%81%8B%E7%AE%97">運算</a>的行程壟斷。若無定時中斷，除非行程自願讓出CPU，否則該行程將持續執行。對於擁有較多I/O<a href="https://zh.wikipedia.org/wiki/%E6%8C%87%E4%BB%A4">指令</a>的行程，往往執行不了多久，便需要讓出CPU；而較依賴處理器的行程相對而言I/O操作較少，反而能一直持續使用CPU，便形成了<a href="https://zh.wikipedia.org/wiki/%E7%8D%A8%E4%BD%94">壟斷</a>現象。</p>
 <div style="break-before: page; page-break-before: always;"></div><h2 id="1天玩轉c-socket通信技術"><a class="header" href="#1天玩轉c-socket通信技術">1天玩轉c++ socket通信技術</a></h2>
 <p>socket是什麼意思
 在計算機通信領域，socket 被翻譯為“套接字”，它是計算機之間進行通信的一種約定或一種方式。通過 socket 這種約定，一臺計算機可以接收其他計算機的數據，也可以向其他計算機發送數據。</p>
@@ -58300,9 +58300,9 @@ sudo cgdelete -g memory,cpuset:limitchrome
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="linux-效能分析工具-perf-1"><a class="header" href="#linux-效能分析工具-perf-1">Linux 效能分析工具: Perf</a></h1>
 <h2 id="簡介-2"><a class="header" href="#簡介-2">簡介</a></h2>
-<p><a href="https://perf.wiki.kernel.org/index.php/Main_Page">Perf</a> 全名是 Performance Event，是在 Linux 2.6.31 以後內建的系統效能分析工具，它隨著核心一併釋出。藉由 perf，應用程式可以利用 PMU (Performance Monitoring Unit), tracepoint 和核心內部的特殊計數器 (counter) 來進行統計，另外還能同時分析運行中的核心程式碼，從而更全面了解應用程式中的效能瓶頸。</p>
+<p><a href="https://perf.wiki.kernel.org/index.php/Main_Page">Perf</a> 全名是 Performance Event，是在 Linux 2.6.31 以後內建的系統效能分析工具，它隨著核心一併釋出。藉由 perf，應用程式可以利用 PMU (Performance Monitoring Unit), tracepoint 和核心內部的特殊計數器 (counter) 來進行統計，另外還能同時分析運行中的核心程式碼，從而更全面瞭解應用程式中的效能瓶頸。</p>
 <p>相較於 <a href="https://en.wikipedia.org/wiki/OProfile">OProfile</a> 和 <a href="https://sourceware.org/binutils/docs/gprof/">GProf</a> ，perf 的優勢在於與 Linux Kernel 緊密結合，並可受益於最先納入核心的新特徵。perf 基本原理是對目標進行取樣，紀錄特定的條件下所偵測的事件是否發生以及發生的次數。例如根據 tick 中斷進行取樣，即在 tick 中斷內觸發取樣點，在取樣點裡判斷行程 (process) 當時的 context。假如一個行程 90% 的時間都花費在函式 foo() 上，那麼 90% 的取樣點都應該落在函式 foo() 的上下文中。</p>
-<p>Perf 可取樣的事件非常多，可以分析 Hardware event，如 cpu-cycles、instructions 、cache-misses、branch-misses …等等。可以分析 Software event，如 page-faults、context-switches …等等，另外一種就是 Tracepoint event。知道了 cpu-cycles、instructions 我們可以了解 Instruction per cycle 是多少，進而判斷程式碼有沒有好好利用 CPU，cache-misses 可以曉得是否有善用 Locality of reference ，branch-misses 多了是否導致嚴重的 pipeline hazard？另外 Perf 還可以對函式進行採樣，了解效能卡在哪邊。</p>
+<p>Perf 可取樣的事件非常多，可以分析 Hardware event，如 cpu-cycles、instructions 、cache-misses、branch-misses …等等。可以分析 Software event，如 page-faults、context-switches …等等，另外一種就是 Tracepoint event。知道了 cpu-cycles、instructions 我們可以瞭解 Instruction per cycle 是多少，進而判斷程式碼有沒有好好利用 CPU，cache-misses 可以曉得是否有善用 Locality of reference ，branch-misses 多了是否導致嚴重的 pipeline hazard？另外 Perf 還可以對函式進行採樣，瞭解效能卡在哪邊。</p>
 <h2 id="安裝-4"><a class="header" href="#安裝-4">安裝</a></h2>
 <p>首先利用以下指令查看目前的 Kernel config 有沒有啟用 Perf。如果 PC 上是裝一般 Linux distro，預設值應該都有開啟。</p>
 <pre><code class="language-sh">＄ cat &quot;/boot/config-`uname -r`&quot; | grep &quot;PERF_EVENT&quot;
@@ -58378,7 +58378,7 @@ g++ perf_top_example.o -o example
 <h2 id="背景知識-1"><a class="header" href="#背景知識-1">背景知識</a></h2>
 <p>以下節錄上海交大通信與電子工程系的劉明寫的文章：</p>
 <p><a href="https://www.ibm.com/developerworks/cn/linux/l-cn-perf1/">Perf – Linux下的系統性能調優工具</a></p>
-<p><a href="https://zh.wikipedia.org/zh-tw/Wikipedia:%E7%B9%81%E7%AE%80%E5%88%86%E6%AD%A7%E8%AF%8D%E8%A1%A8#.E7.A7.91.E6.8A.80">簡繁體中文詞彙對照：科技纇</a> (本課程斟酌修改詞彙，<code>==&gt;</code> 開頭表示補充)</p>
+<p><a href="https://zh.wikipedia.org/zh-tw/Wikipedia:%E7%B9%81%E7%B0%A1%E5%88%86%E6%AD%A7%E8%A9%9E%E8%A1%A8#.E7.A7.91.E6.8A.80">簡繁體中文詞彙對照：科技纇</a> (本課程斟酌修改詞彙，<code>==&gt;</code> 開頭表示補充)</p>
 <ul>
 <li><strong>背景知識</strong></li>
 </ul>
@@ -58453,7 +58453,7 @@ g++ perf_top_example.o -o example
 <pre><code>$ perf top -e cache-misses -c 5000
 </code></pre>
 <h3 id="perf-stat-1"><a class="header" href="#perf-stat-1">perf stat</a></h3>
-<p>相較於 top，使用 perf stat 往往是你已經有個要優化的目標，對這個目標進行特定或一系列的 event 檢查，進而了解該程序的效能概況。（event 沒有指定的話，預設會有十種常用 event。） 我們來對以下程式使用 perf stat 工具 分析 cache miss 情形</p>
+<p>相較於 top，使用 perf stat 往往是你已經有個要優化的目標，對這個目標進行特定或一系列的 event 檢查，進而瞭解該程序的效能概況。（event 沒有指定的話，預設會有十種常用 event。） 我們來對以下程式使用 perf stat 工具 分析 cache miss 情形</p>
 <pre><code class="language-c">static char array[10000][10000];
 int main (void){
   int i, j;
@@ -58541,7 +58541,7 @@ $ perf report
 <p>間接消耗：多核的cache之間得共享資料。間接消耗對於程序的影響要看執行緒工作區運算元據的大小。</p>
 <p>性能分析查看Context Switches的方法</p>
 <p>Linux中可以通過工具vmstat, dstat, pidstat來觀察CS的切換情況。vmstat, dstat只能觀察整個系統的切換情況，而pidstat可以更精確地觀察某個處理程序的上下文切換情況。</p>
-<p>最常見的，在一些<a href="https://zh.wikipedia.org/wiki/%E6%8E%92%E7%A8%8B">排程</a>（scheduling）<a href="https://zh.wikipedia.org/wiki/%E7%AE%97%E6%B3%95">演算法</a>內，其中行程有時候需要暫時離開CPU，讓另一個行程進來CPU運作。在先佔式多工系統中，每一個行程都將輪流執行不定長度的時間，這些時間段落稱為<a href="https://zh.wikipedia.org/wiki/%E6%97%B6%E9%97%B4%E7%89%87">時間片</a>。如果行程並非自願讓出CPU(例如執行<a href="https://zh.wikipedia.org/wiki/I/O">I/O</a>操作時，行程就需放棄CPU使用權)，當時限到時，系統將產生一個定時中斷，<a href="https://zh.wikipedia.org/wiki/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%B5%B1">作業系統</a>將排定由其它的行程來執行。此機制用以確保CPU不致被較依賴處理器<a href="https://zh.wikipedia.org/wiki/%E8%BF%90%E7%AE%97">運算</a>的行程壟斷。若無定時中斷，除非行程自願讓出CPU，否則該行程將持續執行。對於擁有較多I/O<a href="https://zh.wikipedia.org/wiki/%E6%8C%87%E4%BB%A4">指令</a>的行程，往往執行不了多久，便需要讓出CPU；而較依賴處理器的行程相對而言I/O操作較少，反而能一直持續使用CPU，便形成了<a href="https://zh.wikipedia.org/wiki/%E7%8B%AC%E5%8D%A0">壟斷</a>現象。</p>
+<p>最常見的，在一些<a href="https://zh.wikipedia.org/wiki/%E6%8E%92%E7%A8%8B">排程</a>（scheduling）<a href="https://zh.wikipedia.org/wiki/%E7%AE%97%E6%B3%95">演算法</a>內，其中行程有時候需要暫時離開CPU，讓另一個行程進來CPU運作。在先佔式多工系統中，每一個行程都將輪流執行不定長度的時間，這些時間段落稱為<a href="https://zh.wikipedia.org/wiki/%E6%99%82%E9%96%93%E7%89%87">時間片</a>。如果行程並非自願讓出CPU(例如執行<a href="https://zh.wikipedia.org/wiki/I/O">I/O</a>操作時，行程就需放棄CPU使用權)，當時限到時，系統將產生一個定時中斷，<a href="https://zh.wikipedia.org/wiki/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%B5%B1">作業系統</a>將排定由其它的行程來執行。此機制用以確保CPU不致被較依賴處理器<a href="https://zh.wikipedia.org/wiki/%E9%81%8B%E7%AE%97">運算</a>的行程壟斷。若無定時中斷，除非行程自願讓出CPU，否則該行程將持續執行。對於擁有較多I/O<a href="https://zh.wikipedia.org/wiki/%E6%8C%87%E4%BB%A4">指令</a>的行程，往往執行不了多久，便需要讓出CPU；而較依賴處理器的行程相對而言I/O操作較少，反而能一直持續使用CPU，便形成了<a href="https://zh.wikipedia.org/wiki/%E7%8D%A8%E4%BD%94">壟斷</a>現象。</p>
 <div style="break-before: page; page-break-before: always;"></div><h2 id="你還在用老派網格交易嗎-試試新一代的-bollmaker-策略吧"><a class="header" href="#你還在用老派網格交易嗎-試試新一代的-bollmaker-策略吧">你還在用老派網格交易嗎? 試試新一代的 bollmaker 策略吧</a></h2>
 <h2 id="網格交易"><a class="header" href="#網格交易">網格交易</a></h2>
 <p>其實經歷 2020 年到 2022 年這整整兩年的加密貨幣牛市，很多人應該都已經知道網格交易策略是什麼。</p>
@@ -60093,7 +60093,7 @@ def market_close(context):
 <div style="break-before: page; page-break-before: always;"></div><h1 id="策略優化--如何避免過擬合"><a class="header" href="#策略優化--如何避免過擬合">策略優化 – 如何避免過擬合？</a></h1>
 <p>出處:https://www.finlab.tw/backtesting-overfitting-probability/</p>
 <p><img src="strategy/images/thumbnail-8-1.png" alt="thumbnail 8 1" /></p>
-<p>當你做回測做久了，就會發現，找到「歷史報酬率」好的策略很簡單，但是找到「未來報酬率」好的策略非常難。原因在於做了過多的參數枚舉與優化，當樣本數夠大，自然會有極端的數據產生，就像是夜路走多了會碰到鬼，人多必有白癡，樹多必有枯枝，就像是量子力學中，波函數坍縮成我們所處的現實，代表著均值，但在極端的多重宇宙樣本中，你也有可能是總統，代表著眾多巧合下的極端事件。</p>
+<p>當你做回測做久了，就會發現，找到「歷史報酬率」好的策略很簡單，但是找到「未來報酬率」好的策略非常難。原因在於做了過多的參數枚舉與優化，當樣本數夠大，自然會有極端的數據產生，就像是夜路走多了會碰到鬼，人多必有白痴，樹多必有枯枝，就像是量子力學中，波函數坍縮成我們所處的現實，代表著均值，但在極端的多重宇宙樣本中，你也有可能是總統，代表著眾多巧合下的極端事件。</p>
 <p><a href="https://www.finlab.tw/backtesting-overfitting-probability/#ben_wen_jiu_shi_yong_kou_yu_de_fang_shi_dai_ni_liao_jie_ru_he_pan_duan_guo_ni_he_de_yan_suan_fa">1 本文就是用口語的方式，帶你瞭解如何判斷過擬合的演算法</a></p>
 <p><a href="https://www.finlab.tw/backtesting-overfitting-probability/#wo_men_hen_you_ke_neng_shi_you_hua_za_xun_er_fei_you_hua_jia_ge_de_gui_lu">2 我們很有可能是優化雜訊，而非優化價格的規律。</a></p>
 <p><a href="https://www.finlab.tw/backtesting-overfitting-probability/#yao_zen_me_bian_bie_zhe_liang_zhe_de_bu_tong_ne">2.1 要怎麼辨別這兩者的不同呢？</a></p>
@@ -60124,7 +60124,7 @@ def market_close(context):
 Bailey, D.H., Borwein, J., Lopez de Prado, M. and Zhu, Q.J., 2016. The probability of backtest overfitting. Journal of Computational Finance, forthcoming.</p>
 <h3 id="1-確定參數效果真的比較好"><a class="header" href="#1-確定參數效果真的比較好">1. 確定參數效果真的比較好</a></h3>
 <p>任何策略都有好與不好的時候，要確定參數效果很好，不是看績效是正的就好，而是要跟其他參數的績效作比較，
-例如最近台股上漲，雞犬升天，所以任何人投資績效都是正的，但不帶表大家都是投資高手，
+例如最近臺股上漲，雞犬昇天，所以任何人投資績效都是正的，但不帶表大家都是投資高手，
 所以就算績效是正的，還要看績效的排名才行！</p>
 <p>所以論文中的作者，針對所有參數產生出來績效，從「樣本內」找到「最佳參數」，並且將「樣本外的績效」由小到大排名，並且觀察「最佳參數」是否位於前 1/2 的機率</p>
 <h3 id="2-產生多重的-is-跟-oos"><a class="header" href="#2-產生多重的-is-跟-oos">2. 產生多重的 IS 跟 OOS</a></h3>
@@ -61456,7 +61456,7 @@ report = backtest.sim(stocks4, resample=&quot;Q&quot;, fee_ratio=0, tax_ratio=0)
 <div style="break-before: page; page-break-before: always;"></div><p>　俗話說得好，會買股票是徒弟，會賣股票才是師傅。飆股人人都買過，但真正賺到大錢的百不得一。  by <a href="https://www.facebook.com/groups/ssd9971/">奇正2</a></p>
 <p><strong>多重出場點：單純性與多個出場點</strong>　　</p>
 <p>交易系統設計應該採用單純的概念。我們之所以強調單純性，因為這代表相關系統是建構在「瞭解」的基礎上，而不是最佳化。　　單純的概念可以引用到許多不同市場與不同交易工具。我們雖然強調單純，但交易系統仍然可以設定多個出場點。這是兩個不相互衝突的概念，單純性是交易系統之能夠有效的必要條件，多重出場點則是滿足交易目標的必要條件。出場點雖然有很多個，但每個出場點都可以源自簡單的概念。</p>
-<p>讓我們看個例子。假定我們想使用順勢系統，而且希望留在市場久一點。我們不相信神奇的進場訊號，所以要留給部位較大的迴旋空間。另外，萬一出現重大不利走勢，系統必須保障資本，部位必須認賠。最後，由於起始停損相當寬鬆，我們將儘可能獲取較大的利潤，當獲利達到4R時，停止點將設定得更緊密一些。因此，我們要根據這些信念，設計一套適用的交易系統。這個例子顯示一項重要觀念:交易系統設計上必須符合個人信念。這也是交易系統設計的祕訣之一。　　</p>
+<p>讓我們看個例子。假定我們想使用順勢系統，而且希望留在市場久一點。我們不相信神奇的進場訊號，所以要留給部位較大的迴旋空間。另外，萬一出現重大不利走勢，系統必須保障資本，部位必須認賠。最後，由於起始停損相當寬鬆，我們將儘可能獲取較大的利潤，當獲利達到4R時，停止點將設定得更緊密一些。因此，我們要根據這些信念，設計一套適用的交易系統。這個例子顯示一項重要觀念:交易系統設計上必須符合個人信念。這也是交易系統設計的秘訣之一。　　</p>
 <p>首先，進場點的起始停損必須相當寬鬆，提供充分的迴旋空間，不至於造成訊號反覆而增添交易成本。我們決定採用前文提到的辦法：3倍的價格波動。這是最糟狀況的停損，但也是後續的追蹤型停止點，因為每天收盤價如果朝有利方向變動，我們將依此重新設定停止點。　　</p>
 <p>其次，我們相信，如果市場出現強勁的反向走勢，就應該結束部位。所以，我們決定，只要任何一天的價格反向走勢超過每天價格波動的2倍(由前一天收盤價起算)，就結束部位。這個停止點與前一段的停止點是並存的。　　</p>
 <p>最後，獲利一旦到達4R，將採用緊密的停止點，避免吐回太多帳面獲利。所以，獲利到達4R之後，停止點將設定為平均真實區間的1．6倍(不是原來的3倍)：從此之後，這也是唯一的停止點。　　請注意，這些停止設定都很單純，清楚反映我們所想要的目的。沒有經過歷史測試，所以沒有最佳化的問題。完全沒有涉及火箭科學，所以很簡單。總共有3種停止點，但任何時刻都只有一個停止點真正有效，也就是最接近當時市場價格者。(摘自「交易‧創造自己的聖盃」/ 凡‧沙普)</p>
@@ -61749,7 +61749,43 @@ month = [f&quot;{i}月&quot; for i in range(0, 13)]
 stock_data_gb_month[&quot;month&quot;] = stock_data_gb_month[&quot;month&quot;].apply(lambda x: month[x])
 draw_candle_stick(stock_data_gb_month, &quot;month&quot;)
 </code></pre>
-<div style="break-before: page; page-break-before: always;"></div><h2 id="統計大盤每年平均日k振幅"><a class="header" href="#統計大盤每年平均日k振幅">統計大盤每年平均日K振幅</a></h2>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="ema-楊雲翔"><a class="header" href="#ema-楊雲翔">EMA 楊雲翔</a></h2>
+<pre><code class="language-python">import yfinance as yf
+import pandas as pd
+
+def ema(data, period, N=2):
+    &quot;&quot;&quot;
+    計算 EMA（指數移動平均）指標
+    :param data: 包含價格數據的 Pandas DataFrame
+    :param period: EMA 的時間週期
+    :return: 包含 EMA 指標數據的 Pandas Series
+    &quot;&quot;&quot;
+    # 計算平滑因子
+    alpha = N / (period + 1)
+
+    # 計算首個 EMA 值
+    ema = data['Close'].ewm(alpha=alpha, adjust=False).mean()
+
+    # 計算後續 EMA 值
+    for i in range(1, len(data)):
+        ema[i] = alpha * data['Close'][i] + (1 - alpha) * ema[i - 1]
+
+    return ema
+
+# 獲取股票數據
+symbol = 'AAPL'  # 股票代碼
+start_date = '2021-01-01'  # 開始日期
+end_date = '2021-12-31'  # 結束日期
+data = yf.download(symbol, start=start_date, end=end_date)
+
+# 計算 EMA 指標
+data['N2'] = ema(data, 10)
+data['N1'] = ema(data, 10, 1)
+
+# 輸出結果
+print(data)
+</code></pre>
+<h2 id="統計大盤每年平均日k振幅"><a class="header" href="#統計大盤每年平均日k振幅">統計大盤每年平均日K振幅</a></h2>
 <pre><code class="language-python">import yfinance as yf
 import pandas as pd
 
