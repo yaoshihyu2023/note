@@ -138,7 +138,26 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h2 id="sched-定時"><a class="header" href="#sched-定時">sched 定時</a></h2>
+                        <h2 id="keyvalue-sqlite"><a class="header" href="#keyvalue-sqlite">keyvalue-sqlite</a></h2>
+<pre><code class="language-python"># pip install keyvalue-sqlite
+from keyvalue_sqlite import KeyValueSqlite
+
+DB_PATH = './db.sqlite'
+
+db = KeyValueSqlite(DB_PATH, 'table-name')
+
+# Now use standard dictionary operators
+db.set('0', {&quot;1101&quot;:23, &quot;2330&quot;: 100})
+actual_value = db.get('0')
+print(actual_value)
+db.set('0', '211')
+actual_value = db.get('0')
+print(actual_value)
+db.remove('0')
+actual_value = db.get('0')
+print(actual_value)
+</code></pre>
+<h2 id="sched-定時"><a class="header" href="#sched-定時">sched 定時</a></h2>
 <pre><code class="language-python">import sched
 import time
 import datetime

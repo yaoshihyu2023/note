@@ -56203,7 +56203,26 @@ def clear_all():
                 print(f&quot;{one_pnl.code} {[pnl.pnl for pnl in pnls if pnl.code==one_pnl.code]} {order.action.value} {order.quantity} 張 {order.price} 元&quot;)
 </code></pre>
 <p><a href="https://ithelp.ithome.com.tw/users/20140938/ironman/4335">永豐金API之30天不中斷Q&amp;A 系列</a></p>
-<div style="break-before: page; page-break-before: always;"></div><h2 id="sched-定時"><a class="header" href="#sched-定時">sched 定時</a></h2>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="keyvalue-sqlite"><a class="header" href="#keyvalue-sqlite">keyvalue-sqlite</a></h2>
+<pre><code class="language-python"># pip install keyvalue-sqlite
+from keyvalue_sqlite import KeyValueSqlite
+
+DB_PATH = './db.sqlite'
+
+db = KeyValueSqlite(DB_PATH, 'table-name')
+
+# Now use standard dictionary operators
+db.set('0', {&quot;1101&quot;:23, &quot;2330&quot;: 100})
+actual_value = db.get('0')
+print(actual_value)
+db.set('0', '211')
+actual_value = db.get('0')
+print(actual_value)
+db.remove('0')
+actual_value = db.get('0')
+print(actual_value)
+</code></pre>
+<h2 id="sched-定時"><a class="header" href="#sched-定時">sched 定時</a></h2>
 <pre><code class="language-python">import sched
 import time
 import datetime
