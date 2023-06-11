@@ -209,7 +209,12 @@ find . -name &quot;.git&quot; -type d -exec sh -c '
 \setCJKmainfont{PingFang TC}
 </code></pre>
 </li>
+<li>
+<p>每個月底執行 command</p>
+</li>
 </ul>
+<pre><code class="language-sh">0 0 28-31 * * [ &quot;$(date +\%d -d tomorrow)&quot; = &quot;01&quot; ] &amp;&amp; command
+</code></pre>
 
                         <script src="https://utteranc.es/client.js"
                             repo="imxood/imxood.github.io"

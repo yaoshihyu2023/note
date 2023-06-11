@@ -559,7 +559,12 @@ find . -name &quot;.git&quot; -type d -exec sh -c '
 \setCJKmainfont{PingFang TC}
 </code></pre>
 </li>
+<li>
+<p>每個月底執行 command</p>
+</li>
 </ul>
+<pre><code class="language-sh">0 0 28-31 * * [ &quot;$(date +\%d -d tomorrow)&quot; = &quot;01&quot; ] &amp;&amp; command
+</code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="asciinema-把終端操作錄製成-gif-動畫"><a class="header" href="#asciinema-把終端操作錄製成-gif-動畫">asciinema 把終端操作錄製成 gif 動畫</a></h1>
 <p><a href="https://asciinema.org/">asciinema</a> 是一個開源工具，可以把終端上的操作錄制下來轉換成 git 動畫，也可以進一步使用 ffmpeg 將動畫圖片轉換成 mp4 視頻。</p>
 <h2 id="安裝"><a class="header" href="#安裝">安裝</a></h2>
