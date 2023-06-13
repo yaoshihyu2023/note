@@ -56208,7 +56208,29 @@ def clear_all():
                 print(f&quot;{one_pnl.code} {[pnl.pnl for pnl in pnls if pnl.code==one_pnl.code]} {order.action.value} {order.quantity} 張 {order.price} 元&quot;)
 </code></pre>
 <p><a href="https://ithelp.ithome.com.tw/users/20140938/ironman/4335">永豐金API之30天不中斷Q&amp;A 系列</a></p>
-<div style="break-before: page; page-break-before: always;"></div><h2 id="抓取美股分k歷史數據"><a class="header" href="#抓取美股分k歷史數據">抓取美股分K歷史數據</a></h2>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="創立每列"><a class="header" href="#創立每列">創立每列</a></h2>
+<pre><code class="language-python">import pandas as pd
+
+# 创建空的 DataFrame
+df = pd.DataFrame(columns=['Technology', 'Consumer', 'Healthcare', 'Energy'])
+
+# 股票字典
+stocks = {
+    'GOOG': ['Technology', 'Healthcare'],
+    'AAPL': ['Consumer']
+}
+
+# 遍历股票字典并将 DataFrame 中相应的单元格设置为 True
+for stock, industries in stocks.items():
+    for industry in industries:
+        df.loc[stock, industry] = True
+
+# 将缺失值（即 False）替换为 False
+df.fillna(False, inplace=True)
+
+print(df)
+</code></pre>
+<h2 id="抓取美股分k歷史數據"><a class="header" href="#抓取美股分k歷史數據">抓取美股分K歷史數據</a></h2>
 <pre><code class="language-python">import yfinance as yf
 import pandas as pd
 import datetime as dt
