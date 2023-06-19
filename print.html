@@ -62798,7 +62798,10 @@ report = backtest.sim(stocks4, resample=&quot;Q&quot;, fee_ratio=0, tax_ratio=0)
 </ul>
 </li>
 <li>
-<p>拿獲利賭</p>
+<p>賭博式停利法</p>
+<ul>
+<li>拿獲利一半來賭</li>
+</ul>
 </li>
 <li>
 <p>YT 網友: 多頭市場很適合向下攤平 </p>
@@ -62925,6 +62928,18 @@ report = backtest.sim(stocks4, resample=&quot;Q&quot;, fee_ratio=0, tax_ratio=0)
 <p>總體經濟好+技術弱=市場超漲有短線疑慮-&gt;減碼</p>
 <p>總體經濟好+技術強=安心持有</p>
 <p>總體經濟差+技術弱=空手</p>
+<h1 id="崩潰線型"><a class="header" href="#崩潰線型">崩潰線型</a></h1>
+<h2 id="-2"><a class="header" href="#-2"><img src="strategy/images/%E5%B4%A9%E6%BD%B0%E7%B7%9A%E5%9E%8B-1.jpg" alt="img" /></a></h2>
+<h2 id="-3"><a class="header" href="#-3"><img src="strategy/images/%E5%B4%A9%E6%BD%B05.png" alt="img" /></a></h2>
+<h2 id="正方形黃色發動點第一根藍色圓圈是買點"><a class="header" href="#正方形黃色發動點第一根藍色圓圈是買點">**正方形黃色=發動點第一根；**<strong>藍色圓圈是買點。</strong></a></h2>
+<p>我建議要抓就抓兩根以上的大黑棒，每根超過1%(越多越好、越猛越好)
+基本上已經可以用這個推論出很多更進階甚至更漂亮的買點。</p>
+<p>這招在季線上揚(包括向上震盪)的時候非常關鍵好用
+而且這種買點通常都是投資人最恐慌的時候，但知識就是力量，賺錢就是靠這個。</p>
+<p>只是務必不要太求精準，太精準會錯過許多買點，了解其中的涵義更為重要
+例如你可以想想，那空頭怎麼用，反著用就好。</p>
+<p>而這些你如果願意再花點時間回測，我相信你還可以找到更多更好的潛在買點來提升報酬率，祝大家在股市順利！</p>
+<p><img src="strategy/images/Blogger.png" alt="img" /></p>
 <div style="break-before: page; page-break-before: always;"></div><h2 id="資源"><a class="header" href="#資源">資源</a></h2>
 <ul>
 <li>fmz</li>
@@ -63772,7 +63787,7 @@ print(json.dumps(response, indent=4, ensure_ascii=False))
 <p>首先讀者要稍微回憶一下中學數學--線性回歸(linear regression)，可自行GOOGLE相關資料，不想花時間知其所以然，也沒關係，直接往下讀也不難上手應用。</p>
 <p>透過線性回歸計算，我們可以把某個區間的價格(例如過去5根K棒收盤價)計算其線性關係，如下圖所示，θ即是這條線與Y軸的角度，m斜率即是度量y與x變動比率。無論角度或斜率，在Powerlanguage都有內建函式可供直接引用計算。</p>
 <p><a href="https://2.bp.blogspot.com/-u0yXfr_5zIg/XJ-QDdc5EmI/AAAAAAAACNM/Rrg8V0v8Tuk6BpA1Fs0TFkGWTOQOEUWXwCLcBGAs/s1600/Multicharts_%E6%96%9C%E7%8E%87%E8%A7%92%E5%BA%A6201903001.jpg"><img src="strategy/images/5cde19d52121a1335C19B2368D4A4D9E0631C6F3DF4D920190517101757.png" alt="img" /></a></p>
-<h4 id="-2"><a class="header" href="#-2"></a></h4>
+<h4 id="-4"><a class="header" href="#-4"></a></h4>
 <h4 id="角度linearregangle"><a class="header" href="#角度linearregangle">角度(LinearRegAngle)</a></h4>
 <p>行情強勢多頭，漲勢就會越接近90度，反之，行情重挫，下跌的角度就會接近-90度，很多人以為是要用斜率來表達價格趨勢的變化，其實用角度更為直觀。我們用LinearRegAngle這個函式可計算出角度：</p>
 <p>LinearRegAngle(Price, Len)</p>
