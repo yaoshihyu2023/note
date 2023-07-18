@@ -65734,7 +65734,9 @@ plot(setupCondition ? buyLimitPrice : na, &quot;Buy Limit&quot;, color.lime, 1, 
 <h2 id="出場"><a class="header" href="#出場">出場</a></h2>
 <ul>
 <li>等幅會跟上一波大於等於上波漲幅去觀察</li>
-<li>進場5~10％停損，獲利10% 以上移動停利   周K翻黑出場</li>
+<li>進場沒獲利情況設 5~10％停損，當獲利10% 以上移動停利或周K翻黑出場</li>
+<li>停損設突破長紅棒最低點</li>
+<li>停損跳空上漲缺口區 (回補缺口代表弱掉)</li>
 <li>高檔暴大量，換手常常伴隨大黑K</li>
 <li>期貨當天噴出去瘋狂時候賣</li>
 </ul>
@@ -65812,6 +65814,15 @@ plot(setupCondition ? buyLimitPrice : na, &quot;Buy Limit&quot;, color.lime, 1, 
 <li>
 <p>阿魯米</p>
 <ul>
+<li>
+<p>買在波段起漲點安全</p>
+</li>
+<li>
+<p>買在最具有動能的地方安全</p>
+</li>
+<li>
+<p>盤區偏高地方是危險</p>
+</li>
 <li>
 <p>證偽循環的步驟</p>
 <ul>
