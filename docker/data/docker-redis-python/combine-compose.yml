@@ -4,6 +4,7 @@ version: "3"
 services:
   redis:
     build:
+      context: .
       dockerfile: Dockerfile #基於Dockerfile建立image
     image: redis-python
     restart: always
@@ -11,3 +12,6 @@ services:
     ports:
       - 6380:6379
     command: sh -c "redis-server --daemonize yes && tail -f /dev/null" #啟動 redis-server
+    volumes:
+      - ./python_code:/usr/src/app
+

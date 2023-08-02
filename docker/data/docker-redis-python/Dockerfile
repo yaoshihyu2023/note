@@ -1,6 +1,6 @@
 FROM redis
 
-RUN apt-get update && apt-get install -y vim redis-server wget build-essential && \
+RUN apt-get update && apt-get install -y vim tmux htop redis-server wget build-essential && \
     wget -q http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz && \
     tar xzf ta-lib-0.4.0-src.tar.gz && \
     cd ta-lib/ && \
@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y vim redis-server wget build-essential &
     cd .. && \
     rm -rf ta-lib ta-lib-0.4.0-src.tar.gz
 
-RUN wget https://repo.anaconda.com/miniconda/Miniconda3-py38_23.1.0-1-Linux-x86_64.sh -O /tmp/miniconda.sh && \
+RUN wget https://repo.anaconda.com/miniconda/Miniconda3-py311_23.5.2-0-Linux-x86_64.sh -O /tmp/miniconda.sh && \
     /bin/bash /tmp/miniconda.sh -b -p /opt/conda && \
     rm /tmp/miniconda.sh
 
