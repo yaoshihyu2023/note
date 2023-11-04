@@ -206,6 +206,83 @@ if __name__=='__main__':
         mp_sched.run_pending()
         time.sleep(1)
 </code></pre>
+<hr />
+<h2 id="新增刪除任務排程"><a class="header" href="#新增刪除任務排程">新增＆刪除任務排程</a></h2>
+<pre><code class="language-python">import time
+import schedule
+import redis
+
+
+class TaskManager:
+    def __init__(self):
+        self.tasks = {}
+
+    def add_task(
+        self, condition_func, job_func, task_name, interval_seconds=15, tag=None
+    ):
+        self.tasks[task_name] = {
+            &quot;condition&quot;: condition_func,
+            &quot;job&quot;: job_func,
+            &quot;job_id&quot;: None,
+            &quot;interval&quot;: interval_seconds,
+            &quot;tag&quot;: tag,
+        }
+
+    def remove_task(self, task_name):
+        if task_name in self.tasks:
+            if self.tasks[task_name][&quot;job_id&quot;] is not None:
+                schedule.clear(self.tasks[task_name][&quot;job_id&quot;])
+            del self.tasks[task_name]
+
+    def run(self):
+        while True:
+            schedule.run_pending()
+            for task_name, task in self.tasks.items():
+                if task[&quot;condition&quot;]():
+                    if task[&quot;job_id&quot;] is None:
+                        print(&quot;Task added, task name: &quot;, task_name)
+                        task[&quot;job&quot;]()
+                        task[&quot;job_id&quot;] = (
+                            schedule.every(task[&quot;interval&quot;])
+                            .seconds.do(task[&quot;job&quot;])
+                            .tag(task[&quot;tag&quot;])
+                        )
+                else:
+                    if task[&quot;job_id&quot;] is not None:
+                        print(f&quot;Task name: {task_name}&quot;, task[&quot;job_id&quot;])
+                        schedule.clear(tag=task[&quot;tag&quot;])
+                    task[&quot;job_id&quot;] = None
+            time.sleep(1)
+
+
+if __name__ == &quot;__main__&quot;:
+    task_manager = TaskManager()
+    redis_client = redis.StrictRedis(
+        host=&quot;localhost&quot;, port=6379, db=0
+    )  # 修改為您的Redis服務器配置
+
+    def task1_condition():
+        condition_value = redis_client.get(&quot;task_test&quot;)
+        return condition_value and condition_value.decode() == &quot;True&quot;
+
+    def task1_job():
+        print(&quot;Task 1 - Hello&quot;)
+
+    task_manager.add_task(task1_condition, task1_job, &quot;task_test&quot;, 3, tag=&quot;mm_tasks&quot;)
+    task_manager.run()
+
+</code></pre>
+<pre><code class="language-python"># 開關 task_test 測試
+import redis
+
+# 創建Redis連接
+redis_client = redis.StrictRedis(host=&quot;localhost&quot;, port=6379, db=0)  # 修改為您的Redis服務器配置
+
+# 將鍵設置為True
+# redis_client.set(&quot;task_test&quot;, &quot;True&quot;)
+redis_client.set(&quot;task_test&quot;, &quot;False&quot;)
+</code></pre>
+<hr />
 <h1 id="parallel-execution"><a class="header" href="#parallel-execution">Parallel execution</a></h1>
 <p>https://schedule.readthedocs.io/en/stable/parallel-execution.html</p>
 <p><em>am trying to execute 50 items every 10 seconds, but from the my logs it says it executes every item in 10 second schedule serially, is there a work around?</em></p>
