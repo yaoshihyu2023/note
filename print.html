@@ -579,12 +579,15 @@ Java HotSpot(TM) 64-Bit Server VM (build 17.0.7+8-LTS-224, mixed mode, sharing)
 sudo tar -xvzf commandlinetools-linux-xxxxxx_latest.zip -C /usr/local/android-sdk
 </code></pre>
 <p><strong>設定環境變量：</strong> 在您的<code>~/.bashrc</code>或<code>~/.zshrc</code>文件中添加以下環境變量：</p>
-<pre><code class="language-sh">export ANDROID_SDK_ROOT=/usr/local/android-sdk
+<pre><code class="language-sh">export ANDROID_HOME=&quot;/media/shihyu/ssd/android-sdk&quot;
+export ANDROID_SDK_ROOT=&quot;/usr/local/android-sdk&quot;
 export PATH=&quot;$PATH:$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools:$ANDROID_SDK_ROOT/tools/bin&quot;
 </code></pre>
 <p>然後在終端機中運行<code>source ~/.bashrc</code>或<code>source ~/.zshrc</code>以應用變更。</p>
 <p><strong>安裝SDK組件：</strong> 運行以下命令來安裝所需的SDK組件：</p>
-<pre><code class="language-sh">sdkmanager --install &quot;platforms;android-30&quot; &quot;build-tools;30.0.3&quot; &quot;platform-tools&quot;
+<pre><code class="language-sh">sdkmanager --sdk_root=/media/shihyu/ssd/android-sdk --install &quot;platforms;android-30&quot; &quot;build-tools;30.0.3&quot; &quot;platform-tools&quot;
+
+sdkmanager --sdk_root=/media/shihyu/ssd/android-sdk  --install &quot;cmdline-tools;latest&quot;
 </code></pre>
 <p>這將安裝Android 30平臺、30.0.3版本的構建工具以及平臺工具。</p>
 <p>現在，您已經成功安裝了Android SDK，可以開始使用Flutter來開發Android應用程序。請注意，這些步驟可能需要根據您的系統配置和Android SDK版本進行微調。</p>
@@ -603,7 +606,8 @@ export PATH=&quot;$PATH:$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_
 <ol>
 <li>運行以下命令來檢查Flutter的依賴項：</li>
 </ol>
-<pre><code class="language-sh">flutter doctor
+<pre><code class="language-sh">flutter doctor --android-licenses
+flutter doctor
 </code></pre>
 <ol>
 <li>根據<code>flutter doctor</code>的輸出，安裝所需的依賴項，例如Android Studio、Xcode（僅限Mac）、Dart等。</li>
