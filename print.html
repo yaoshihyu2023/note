@@ -557,6 +557,21 @@ build-tools  cmdline-tools  commandlinetools-linux-7583922_latest.zip  emulator 
 </code></pre>
 <p>至此，Linux安裝Android Sdk完成！</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="flutter"><a class="header" href="#flutter">Flutter</a></h1>
+<h2 id="jdkjava-development-kit"><a class="header" href="#jdkjava-development-kit">JDK（Java Development Kit）</a></h2>
+<pre><code class="language-sh">wget https://download.oracle.com/java/17/latest/jdk-17_linux-x64_bin.tar.gz
+
+tar -xvf jdk-17_linux-x64_bin.tar.gz
+sudo mv jdk-17.0.7 /usr/lib/jvm/
+</code></pre>
+<p>設置Java環境變量 為了讓系統能夠找到 JDK，需要設置 <code>JAVA_HOME</code> 環境變量，並將其添加到 <code>PATH</code> 變量中。可以通過<code>vi ~/.bashrc</code>來編輯 <code>~/.bashrc</code> 或 <code>~/.profile</code> 文件來實現。打開文件並在文件末尾添加以下內容： </p>
+<pre><code class="language-sh">export JAVA_HOME=/usr/lib/jvm/jdk-17.0.7
+export PATH=$JAVA_HOME/bin:$PATH
+</code></pre>
+<pre><code class="language-sh">dioxidecn@dioxidecn-virtual-machine:~$ java -version
+java version &quot;17.0.7&quot; 2023-04-18 LTS
+Java(TM) SE Runtime Environment (build 17.0.7+8-LTS-224)
+Java HotSpot(TM) 64-Bit Server VM (build 17.0.7+8-LTS-224, mixed mode, sharing)
+</code></pre>
 <p>在Ubuntu上進行Flutter開發，您需要安裝Android SDK。Flutter使用Android SDK來構建和運行Android應用程序。以下是安裝Android SDK的簡單步驟：</p>
 <p><strong>下載 Android SDK：</strong> 您可以從<a href="https://developer.android.com/studio#command-tools">Android 開發者網站</a>下載 Android SDK Command Line Tools。選擇壓縮檔案（ZIP）版本。</p>
 <p><strong>解壓縮檔案：</strong> 解壓縮下載的檔案到您選擇的目錄。例如，您可以將其解壓縮到<code>/usr/local/android-sdk</code>目錄下。</p>
