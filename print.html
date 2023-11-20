@@ -1570,6 +1570,33 @@ export default defineComponent({
 }
 &lt;/style&gt;
 </code></pre>
+<pre><code class="language-html">&lt;template&gt;
+  &lt;div id=&quot;app&quot;&gt;
+    &lt;Chart /&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+
+&lt;script&gt;
+import { defineComponent } from 'vue';
+import { Chart } from 'vue-tradingview-widgets';
+
+export default defineComponent({
+  name: 'App',
+  components: {
+    Chart,
+  },
+});
+&lt;/script&gt;
+
+&lt;style&gt;
+#app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  text-align: center;
+  color: #2c3e50;
+  margin-top: 60px;
+}
+&lt;/style&gt;
+</code></pre>
 </li>
 <li>
 <p><strong>Run your Vue.js application:</strong></p>
