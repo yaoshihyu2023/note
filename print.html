@@ -11683,6 +11683,99 @@ impl Foo {
 <span class="boring">}
 </span></code></pre></pre>
 <p>到這邊結束，編譯器已經沒有可用的規則了，但是回傳值的 lifetime 依然是未知，於是就編譯失敗。</p>
+<hr />
+<p>https://buckychu.im/2022/10/05/rust-lifetime/</p>
+<h1 id="rust-的生命週期"><a class="header" href="#rust-的生命週期">Rust 的生命週期</a></h1>
+<p>今天我們要來介紹其他程式語言中比較少見的機制，但是在 Rust 中是屬於和參考（reference）有關的機制，那就是生命週期（lifetime）。</p>
+<h2 id="一生命週期的概念"><a class="header" href="#一生命週期的概念">一、生命週期的概念</a></h2>
+<p>生命週期是 Rust 中的一個概念，它是一個變數的有效範圍，也就是它可以被使用的範圍。生命週期的概念是為了解決 Rust 中的參考的問題，因為參考是 Rust 中的一個重要機制，它可以讓開發者在不需要複製資料的情況下，就可以使用資料。但是參考也有一個問題，就是它的生命週期，也就是它的有效範圍，如果參考的資料已經被釋放了，那麼參考就會變成一個無效的參考，這樣就會造成程式的錯誤。</p>
+<p>這裡有一個範例：</p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>{
+    let r;
+
+    {
+        let x = 5;
+        r = &amp;x;
+    }
+
+    println!(&quot;r: {}&quot;, r);
+}
+<span class="boring">}
+</span></code></pre></pre>
+<p>先說結論，這個範例是沒辦法通過編譯的，也就是會報錯。
+這是因為我們先宣告了一個變數 r，然後我們在一個新的區塊中宣告了一個變數 x，並且將 x 的參考賦值給 r。
+這個時候，x 的生命週期就結束了，但是 r 仍然使用 x 的參考，這樣就會造成程式的錯誤。</p>
+<h2 id="二生命週期的標記"><a class="header" href="#二生命週期的標記">二、生命週期的標記</a></h2>
+<ul>
+<li>生命週期的標記不會改變參考的生命週期，它只是用來標記參考的生命週期，讓 Rust 編譯器可以知道這個參考的生命週期是多少。</li>
+<li>當指定了泛型生命週期參數後，函式就可以接收帶有任何生命週期的參考。</li>
+</ul>
+<p>在語法上有以下幾個重點：</p>
+<ul>
+<li>生命週期參數名稱：
+<ul>
+<li>以單引號 <code>'</code> 開頭</li>
+<li>一般以全部小寫字母命名</li>
+<li>大部分的慣例都使用 <code>'a</code> 作為生命週期參數名稱</li>
+</ul>
+</li>
+<li>生命週期標記的位置：
+<ul>
+<li>在參考的 <code>&amp;</code> 符號之後</li>
+<li>使用空格將生命週期與參考分開</li>
+</ul>
+</li>
+</ul>
+<p>看一下以下的範例：</p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>RUST
+&amp;i32        // 一個參考
+&amp;'a i32     // 一個有顯式生命週期的參考
+&amp;'a mut i32 // 一個有顯式生命週期的可變參考
+<span class="boring">}
+</span></code></pre></pre>
+<p>單一個生命週期標記是沒有意義的，這是因為標記生命週期是為了要讓 Rust 編譯器知道多個參考的生命週期之間的關係，所以如果只有一個參考，那麼就沒有必要標記生命週期。</p>
+<p>以下是一個範例：</p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>fn longer&lt;'a&gt;(s1: &amp;'a str, s2: &amp;'a str) -&gt; &amp;'a str {
+    if s2.len() &gt; s1.len() {
+        s2
+    } else {
+        s1
+    }
+}
+<span class="boring">}
+</span></code></pre></pre>
+<p>這個函式接收兩個參考，並且回傳一個參考，這個函式的生命週期參數名稱是 <code>'a</code>，這個生命週期參數名稱被用在了函式的參數與回傳值上，這樣就可以讓 Rust 編譯器知道這三個參考的生命週期是相同的。</p>
+<p>最後在執行這個函式的時候就不會問題，並且可以正常執行：</p>
+<pre><pre class="playground"><code class="language-rust">fn main() {
+    let r;
+    {
+        let s1 = &quot;rust&quot;;
+        let s2 = &quot;ecmascript&quot;;
+        r = longer(s1, s2);
+        println!(&quot;{} is longer&quot;, r); // ecmascript is longer
+    }
+}
+</code></pre></pre>
+<h2 id="三生命週期的規則"><a class="header" href="#三生命週期的規則">三、生命週期的規則</a></h2>
+<p>在 Rust 中，生命週期的規則有三個：</p>
+<ol>
+<li>每個參考都有一個生命週期</li>
+<li>每個參考都有一個作用域</li>
+<li>一個參考的生命週期不能超過它的作用域</li>
+</ol>
+<h2 id="總結-3"><a class="header" href="#總結-3">總結</a></h2>
+<p>Rust 的生命週期跟所有權，兩者在其語言中的資源管理機制上都是非常重要的。由於參考是 Rust 在對於複雜類型中不可少的機制，而每個參考都有其生命週期，這是為了決定該參考是否有效的作用域。</p>
+<p>前面有提到 Rust 的型別大多數其實都可以自動判別，而生命週期其實也一樣，都是可以自動推導出來。不過當生命週期以不同方式互相牽連的狀態下，開發者就要自行設定，這也跟型別非常複雜的狀態下，開發者就要自行設定型別一樣。</p>
+<p>以上就是 Rust 的生命週期的基本概念，希望大家對 Rust 又更了解了一些。</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="rust-型別系統"><a class="header" href="#rust-型別系統">Rust 型別系統</a></h1>
 <ul>
 <li>Rust 型別系統
@@ -12763,7 +12856,7 @@ fn main() {
 <span class="boring">}
 </span></code></pre></pre>
 <p>這邊 <code>Add</code> 意指 <code>T</code> 必需是可以使用加號相加的型別，包括整數及浮點數都包括在內。由於相加後輸出型別不一定仍然為 T，因此這個函式的回傳型別是 <code>T::Output</code>。Rust 也支援運算子覆載 (operator overloading)，只要你的自訂型別定義了加號操作以及輸出型別，那麼這個自訂型別也可以直接傳入 <code>sum</code> 進行運算。</p>
-<h2 id="總結-3"><a class="header" href="#總結-3">總結</a></h2>
+<h2 id="總結-4"><a class="header" href="#總結-4">總結</a></h2>
 <p>這篇文章中，我把重點放在 Rust 最核心的語言功能上，甚至省略了陣列與字串處理，因為講解這部份就無可避免會提到 borrow checker。在後續幾篇文章中，我將會繼續深入解釋 move semantics 與 borrow checker。</p>
 <div style="break-before: page; page-break-before: always;"></div><blockquote>
 <p>原文鏈接: https://www.youtube.com/watch?v=rDoqT-a6UFg</p>
@@ -39468,7 +39561,7 @@ func main() {
 	fmt.Println(&quot;s1:&quot;,s1)	//[-1,2,3]
 }
 </code></pre>
-<h4 id="總結-4"><a class="header" href="#總結-4">總結</a></h4>
+<h4 id="總結-5"><a class="header" href="#總結-5">總結</a></h4>
 <ul>
 <li>陣列長度不能改變，初始化後長度就是固定的；切片的長度是不固定的，可以追加元素，在追加時可能使切片的容量增大。</li>
 <li>結構不同，陣列是一串固定資料，切片描述的是擷取陣列的一部分資料，從概念上說是一個結構體。</li>
@@ -45310,7 +45403,7 @@ ch &lt;- &quot;EDDYCJY&quot;
 <h3 id="syscall-blocking-profile"><a class="header" href="#syscall-blocking-profile">Syscall blocking profile</a></h3>
 <p><img src="https://codertw.com/wp-content/uploads/img/6dQ43Z54mk.jpg" alt="Golang大殺器之跟蹤剖析trace" /></p>
 <p>通過對以上三項的跟蹤分析，加上這個洩露，這個阻塞的耗時，這個涉及的內部方法名，很明顯就是哪位又忘記關閉客戶端連接了，趕緊改改改。</p>
-<h2 id="總結-5"><a class="header" href="#總結-5">總結</a></h2>
+<h2 id="總結-6"><a class="header" href="#總結-6">總結</a></h2>
 <p>通過本文我們習得了 <code>go tool trace</code> 的武林秘籍，它能夠跟蹤捕獲各種執行中的事件，例如 Goroutine 的創建/阻塞/解除阻塞，Syscall 的進入/退出/阻止，GC 事件，Heap 的大小改變，Processor 啟動/停止等等。</p>
 <p>希望你能夠用好 Go 的兩大殺器 pprof + trace 組合，此乃排查好搭檔，誰用誰清楚，即使他並不萬能。</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="程序進程執行緒線程協程傻傻分得清楚"><a class="header" href="#程序進程執行緒線程協程傻傻分得清楚">程序(進程)、執行緒(線程)、協程，傻傻分得清楚！</a></h1>
@@ -45901,7 +45994,7 @@ main goroutine finished # main goroutine 解除阻塞並結束程式
 <li><code>default:</code>: 在所有的 <code>case</code> 都阻塞的情況下執行</li>
 </ul>
 <p>因為有 <code>default</code> 可以設置，當 Channel 阻塞時也可以藉由 <code>default</code> 輸出資訊讓使用者知道。</p>
-<h2 id="總結-6"><a class="header" href="#總結-6">總結</a></h2>
+<h2 id="總結-7"><a class="header" href="#總結-7">總結</a></h2>
 <p>一開始提到了單執行緒跟多執行緒的差別，接著帶出 Goroutine ，並介紹各種等待方式(<code>time.Sleep</code>, <code>sync.WaitGroup</code> 及 Channel)和執行緒間分享變數的問題(Race Condition)及解決方法(<code>sync.Mutex</code> 及 Channel)，從而帶出 Channel 在執行緒中方便強大的能力。</p>
 <p>再來講述 Channel 的使用方式，及其阻塞的時機(推入阻塞及拉取阻塞)，接著說明 Unbuffered 及 Buffered Channel 的差別，並且說明可以藉由 Unbuffered Channel 降低效能上的損失。</p>
 <p>Channel 傳回的第二個參數：<code>ok</code>，可以判斷此 Channel 是否已經關閉，並被 <code>range</code> 用在結束巡覽的判斷中。</p>
@@ -46294,7 +46387,7 @@ func rpf() *int {
 </ul>
 </li>
 </ul>
-<h1 id="總結-7"><a class="header" href="#總結-7">總結</a></h1>
+<h1 id="總結-8"><a class="header" href="#總結-8">總結</a></h1>
 <p>從<a href="https://alanzhan.dev/post/2022-01-24-golang-goroutine">上一篇</a>讀了那麼硬的知識後，今天來挑戰記憶體管理的歷史到 golang 的記憶體管理相關知識，讀完之後覺得有點痛苦，但是這將會化身成為我們成長的一大養分不是嗎？看完之後你的感想為何呢？</p>
 <p>歡迎到我的 Facebook <a href="https://www.facebook.com/alanzhan0513">Alan 的筆記本</a> 留言，順手給我個讚吧！你的讚將成為我持續更新的動力，感謝你的閱讀，讓我們一起學習成為更好的自己。</p>
 <h2 id="參考-1"><a class="header" href="#參考-1">參考</a></h2>
@@ -46413,7 +46506,7 @@ func rpf() *int {
 </ul>
 </li>
 </ul>
-<h1 id="總結-8"><a class="header" href="#總結-8">總結</a></h1>
+<h1 id="總結-9"><a class="header" href="#總結-9">總結</a></h1>
 <p>好久沒看那麼硬的知識了，但我總覺得我今天會消化不良，我需要反反覆覆在看個好幾次，看完之後你的心得如何呢？</p>
 <p>歡迎到我的 Facebook <a href="https://www.facebook.com/alanzhan0513">Alan 的筆記本</a> 留言，順手給我個讚吧！你的讚將成為我持續更新的動力，感謝你的閱讀，讓我們一起學習成為更好的自己。</p>
 <h2 id="參考-2"><a class="header" href="#參考-2">參考</a></h2>
@@ -47476,7 +47569,7 @@ $ go run -race main.go
 2020/05/02 02:14:04 Write: deposit amonut: 1000
 </code></pre>
 <p>執行之後會發現，本來要花 10 秒，已經縮短成 5 秒了，只要當下是讀的時候，都會同時進行，並不會互相影響，寫的時候就會 block 讀和寫，只有一個寫會發生。</p>
-<h2 id="總結-9"><a class="header" href="#總結-9">總結</a></h2>
+<h2 id="總結-10"><a class="header" href="#總結-10">總結</a></h2>
 <ol>
 <li>在寫 goroutine 的時候，需要考慮 race condition，在執行或測試上可以加上 <code>-race</code> 去檢查，以免結果與預期不符</li>
 <li>遇到 race condition 的時候可以考慮用 <code>sync.Mutex</code> 來解決，有讀寫阻塞的時候可以用 <code>sync.RWMutex</code></li>
@@ -47767,7 +47860,7 @@ func main() {
 <p>根據以上的例子可以空接口提供很多便利性，但是也有其限制：</p>
 <p>一個空的接口會隱藏值對應的表示方式和所有的公開的方法，必須使用類型斷言才能來來訪問內部的值，如果事先不知道空接口指向的值的具體類型，就無法操作。</p>
 <p>為此，才需要 <strong>reflect 機制</strong>，可以知道一個接口類型的變量具體是什麼（什麼類型），有什麼能力（有哪些方法）。這也是在寫 Golang 程式庫常常會用到的特性，因為有 interface 可以實現泛型的特性，有了泛型的特性又可以透過 reflect 機制來促發其不同型態的屬性及方法。</p>
-<h2 id="總結-10"><a class="header" href="#總結-10">總結</a></h2>
+<h2 id="總結-11"><a class="header" href="#總結-11">總結</a></h2>
 <ul>
 <li>Golang interface 重點是「行為」，不管定義的介面型態是什麼，只要行為符合就屬於該介面型態的一種。</li>
 <li>Golang interface 可以說是動態語言鴨子型別的展現。</li>
@@ -64027,7 +64120,7 @@ report = backtest.sim(stocks4, resample=&quot;Q&quot;, fee_ratio=0, tax_ratio=0)
 <p>這個世界並不是線性的，以上述的範例「股東權益報酬率」來說，我們只是假設其數值越高越好，將因子與績效之間的關係假想成是線性。但現實生活中，報酬率與因子之間可能是非線性的，例如「股東權益報酬率」太高，有可能會有均值回歸的狀況發生，使未來股票走勢不好。假如希望可以做的更精細，可以在上述第四步驟中，再額外調整篩選股票的區間段，例如將股票依照因子大小分成五份來回測。</p>
 <h2 id="進階n-階因子"><a class="header" href="#進階n-階因子">進階：N 階因子</a></h2>
 <p>另外，上述步驟中，是假設因子之間並沒有關連，但事實上它們之間會交互作用，例如你單純買「投信買進」的股票可能沒什麼用，但是假如你買「股價暴跌投信還買進」的股票，可能就有用。可以在上述第四步驟中，再額外加入這種反向因子，但是條件越多就會越複雜，要盡量避免過於複雜而導致過擬合喔！</p>
-<h2 id="總結-11"><a class="header" href="#總結-11">總結</a></h2>
+<h2 id="總結-12"><a class="header" href="#總結-12">總結</a></h2>
 <p>選股策略千百種，上述方法是我覺得一定可以產生出好策略的 SOP，但關鍵在於，不要盲目加入一堆條件，把好的股票都篩掉了！要慎選因子。現在就開始使用我們免費公開的超好用回測系統來選股吧！</p>
 <div style="break-before: page; page-break-before: always;"></div><h2 id="順大逆小交易哪種回調入場點勝率最高"><a class="header" href="#順大逆小交易哪種回調入場點勝率最高">順大逆小交易，哪種回調入場點勝率最高？</a></h2>
 <p>https://www.zhihu.com/question/309137888</p>
@@ -67718,7 +67811,7 @@ plot(setupCondition ? buyLimitPrice : na, &quot;Buy Limit&quot;, color.lime, 1, 
 </ul>
 </li>
 </ul>
-<h2 id="總結-12"><a class="header" href="#總結-12">總結</a></h2>
+<h2 id="總結-13"><a class="header" href="#總結-13">總結</a></h2>
 <ul>
 <li>多頭行情想辦法找出主流股</li>
 <li>嘗試不斷高檔減碼、低檔買回、高檔減碼、再低檔買回 by JG</li>
