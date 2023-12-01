@@ -577,6 +577,32 @@ impl Foo {
 <p>Rust 的生命週期跟所有權，兩者在其語言中的資源管理機制上都是非常重要的。由於參考是 Rust 在對於複雜類型中不可少的機制，而每個參考都有其生命週期，這是為了決定該參考是否有效的作用域。</p>
 <p>前面有提到 Rust 的型別大多數其實都可以自動判別，而生命週期其實也一樣，都是可以自動推導出來。不過當生命週期以不同方式互相牽連的狀態下，開發者就要自行設定，這也跟型別非常複雜的狀態下，開發者就要自行設定型別一樣。</p>
 <p>以上就是 Rust 的生命週期的基本概念，希望大家對 Rust 又更了解了一些。</p>
+<hr />
+<pre><pre class="playground"><code class="language-rust">fn example&lt;'a, 'b&gt;(x: &amp;'a str, y: &amp;'b str) -&gt; &amp;'a str
+where 'b: 'a // 'b lives at least as long as 'a  添加了 where 'b: 'a 約束，確保 'b 的生命週期至少與 'a 一樣長
+{
+    if x.len() &gt; y.len() {
+        x
+    } else {
+        y
+    }
+}
+
+fn main() {
+    let x = String::from(&quot;hello&quot;);
+    let y = String::from(&quot;world&quot;);
+
+    let x_ref: &amp;str = &amp;x;
+    let y_ref: &amp;str = &amp;y;
+
+    let result = example(x_ref, y_ref);
+    println!(&quot;Result: {}&quot;, result);
+
+    println!(&quot;x content address: {:p}&quot;, x.as_ptr());
+    println!(&quot;y content address: {:p}&quot;, y.as_ptr());
+    println!(&quot;result content address: {:p}&quot;, result.as_ptr());
+}
+</code></pre></pre>
 
                         <script src="https://utteranc.es/client.js"
                             repo="imxood/imxood.github.io"
