@@ -633,6 +633,301 @@ fn main() {
 </code></pre></pre>
 </li>
 </ul>
+<h3 id="enum-用法"><a class="header" href="#enum-用法">enum 用法</a></h3>
+<pre><pre class="playground"><code class="language-rust">#[allow(clippy::all)]
+enum WebsocketAPI {
+    Default,
+    MultiStream,
+    Custom(String),
+}
+
+fn handle_websocket_api(api: WebsocketAPI) {
+    match api {
+        WebsocketAPI::Default =&gt; {
+            println!(&quot;Handling default WebSocket API&quot;);
+            // Your code for the default case
+        }
+        WebsocketAPI::MultiStream =&gt; {
+            println!(&quot;Handling multi-stream WebSocket API&quot;);
+            // Your code for the multi-stream case
+        }
+        WebsocketAPI::Custom(custom_api) =&gt; {
+            println!(&quot;Handling custom WebSocket API: {}&quot;, custom_api);
+            // Your code for the custom case, using the custom API string
+        }
+    }
+}
+
+fn main() {
+    let default_api = WebsocketAPI::Default;
+    let multi_stream_api = WebsocketAPI::MultiStream;
+    let custom_api = WebsocketAPI::Custom(String::from(&quot;wss://custom.api&quot;));
+
+    handle_websocket_api(default_api);
+    handle_websocket_api(multi_stream_api);
+    handle_websocket_api(custom_api);
+}
+
+</code></pre></pre>
+<h3 id="hashmap-用法"><a class="header" href="#hashmap-用法">HashMap 用法：</a></h3>
+<p><code>HashMap</code>是一種鍵-值對的集合，其中每個鍵必須是唯一的。它是Rust標準庫的一部分，用於實現字典或關聯數組。</p>
+<p>這是一個使用<code>HashMap</code>的例子：</p>
+<pre><pre class="playground"><code class="language-rust">use std::collections::HashMap;
+
+fn main() {
+    // Creating a new HashMap
+    let mut my_map = HashMap::new();
+
+    // Inserting key-value pairs
+    my_map.insert(&quot;key1&quot;, &quot;value1&quot;);
+    my_map.insert(&quot;key2&quot;, &quot;value2&quot;);
+    my_map.insert(&quot;key3&quot;, &quot;value3&quot;);
+
+    // Accessing values using keys
+    if let Some(value) = my_map.get(&quot;key2&quot;) {
+        println!(&quot;Value for key2: {}&quot;, value);
+    }
+
+    // Iterating over key-value pairs
+    for (key, value) in &amp;my_map {
+        println!(&quot;Key: {}, Value: {}&quot;, key, value);
+    }
+}
+</code></pre></pre>
+<h3 id="迭代器的-map-方法"><a class="header" href="#迭代器的-map-方法">迭代器的 <code>map</code> 方法：</a></h3>
+<p>在Rust中，迭代器具有<code>map</code>方法，它通過將函數應用於每個元素來轉換迭代器中的每個項目。這裡是一個簡單的例子：</p>
+<p>在此示例中，使用<code>map</code>方法創建了一個新的迭代器，其中每個元素都加倍。然後使用<code>collect</code>方法將迭代器轉換回向量。</p>
+<pre><pre class="playground"><code class="language-rust">fn main() {
+    let numbers = vec![1, 2, 3, 4, 5];
+
+    // Using map to double each number
+    let doubled_numbers: Vec&lt;_&gt; = numbers.into_iter().map(|x| x * 2).collect();
+
+    println!(&quot;Original numbers: {:?}&quot;, numbers);
+    println!(&quot;Doubled numbers: {:?}&quot;, doubled_numbers);
+}
+</code></pre></pre>
+<h3 id="閉包closures"><a class="header" href="#閉包closures">閉包（closures）</a></h3>
+<p>是一種特殊的函數類型，它可以捕獲其環境中的變數。閉包具有以下幾個用法和優勢：</p>
+<h3 id="簡潔性和靈活性"><a class="header" href="#簡潔性和靈活性">簡潔性和靈活性：</a></h3>
+<p>閉包允許你編寫更為簡潔、直觀的程式碼。相比於定義一個完整的函數，閉包可以直接在需要時聲明和使用，使程式碼更具靈活性。</p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// 使用闭包
+let add = |x, y| x + y;
+println!(&quot;Sum: {}&quot;, add(3, 4));
+
+// 相同的功能使用函数
+fn add_function(x: i32, y: i32) -&gt; i32 {
+    x + y
+}
+println!(&quot;Sum: {}&quot;, add_function(3, 4));
+<span class="boring">}
+</span></code></pre></pre>
+<h3 id="捕獲環境變數"><a class="header" href="#捕獲環境變數">捕獲環境變數：</a></h3>
+<p>閉包可以捕獲其所在範疇中的變數，可以是引用（<code>&amp;</code>）或移動（<code>move</code>）。這允許你在閉包內部使用外部變數，而不需要顯式傳遞參數。</p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let x = 10;
+let closure = || println!(&quot;x: {}&quot;, x);
+closure();
+<span class="boring">}
+</span></code></pre></pre>
+<h3 id="所有權轉移"><a class="header" href="#所有權轉移"><strong>所有權轉移：</strong></a></h3>
+<p>使用 <code>move</code> 關鍵字，閉包可以將其環境中的所有權轉移到閉包內，從而實現所有權的轉移。這對於將資料傳遞給執行緒或其他閉包非常有用。</p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let data = vec![1, 2, 3];
+let closure = move || {
+    // data 所有权已转移到闭包
+    println!(&quot;{:?}&quot;, data);
+};
+closure();
+// 下面的行将会引发编译错误，因为 data 所有权已转移
+// println!(&quot;{:?}&quot;, data);
+<span class="boring">}
+</span></code></pre></pre>
+<h3 id="函數式程式設計"><a class="header" href="#函數式程式設計"><strong>函數式程式設計：</strong></a></h3>
+<p>閉包使Rust更加適合函數式程式設計風格。你可以將閉包傳遞給其他函數，或者將其作為迭代器的參數。</p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let numbers = vec![1, 2, 3, 4, 5];
+let squared: Vec&lt;_&gt; = numbers.into_iter().map(|x| x * x).collect();
+println!(&quot;{:?}&quot;, squared);
+<span class="boring">}
+</span></code></pre></pre>
+<h3 id="泛型和trait的使用"><a class="header" href="#泛型和trait的使用"><strong>泛型和trait的使用：</strong></a></h3>
+<p>閉包可以與泛型和trait一起使用，使其更加通用和靈活。你可以定義一個接受閉包作為參數的泛型函數，以處理不同類型的操作。</p>
+<pre><pre class="playground"><code class="language-rust">fn perform_operation&lt;T, U, F&gt;(value: T, operation: F) -&gt; U
+where
+    F: Fn(T) -&gt; U,
+{
+    operation(value)
+}
+
+fn main() {
+    // 對整數進行操作
+    let result_int = perform_operation(5, |x| x * 2);
+    println!(&quot;Result for integer: {}&quot;, result_int);
+
+    // 對浮點數進行操作
+    let result_float = perform_operation(3.5, |x| x * 2.0);
+    println!(&quot;Result for float: {}&quot;, result_float);
+
+    // 對字串進行操作
+    let result_string = perform_operation(&quot;Hello&quot;, |x| format!(&quot;{}!&quot;, x));
+    println!(&quot;Result for string: {}&quot;, result_string);
+}
+</code></pre></pre>
+<ol>
+<li><code>fn perform_operation&lt;T, U, F&gt;(value: T, operation: F) -&gt; U</code>: 這是一個泛型函數的聲明。它有三個泛型參數，分別為 <code>T</code>、<code>U</code> 和 <code>F</code>。這表示這個函數可以接受不同類型的值（<code>T</code>）和返回不同類型的結果（<code>U</code>），同時還接受一個泛型的函數或閉包（<code>F</code>）。</li>
+<li><code>where F: Fn(T) -&gt; U</code>: 這是一個 trait bound（特徵約束），它規定了泛型 <code>F</code> 必須實現 <code>Fn(T) -&gt; U</code> 這個特徵。這表示 <code>F</code> 必須是一個接受 <code>T</code> 類型參數的函數，並返回 <code>U</code> 類型的值。換句話說，<code>operation</code> 參數必須是一個可以接受 <code>value</code> 類型的函數或閉包。</li>
+<li><code>{ operation(value) }</code>: 函數體中的這一行是具體的實現。它調用了傳入的 <code>operation</code> 函數或閉包，並將 <code>value</code> 作為參數傳遞給它。整個函數最終返回 <code>operation</code> 的結果，這個結果的類型是 <code>U</code>。</li>
+</ol>
+<p>這段程式碼的目的是創建一個通用的函數，可以將一個值和一個函數或閉包傳遞給它，並返回該函數或閉包對該值的操作結果。通過使用泛型，這個函數可以處理不同類型的輸入和輸出。</p>
+<p><code>T</code>、<code>U</code> 和 <code>F</code> 只是慣例上常用的泛型參數名稱，實際上你可以使用任何有效的識別符號作為泛型參數名稱。這些字母通常代表不同的概念：</p>
+<ul>
+<li><code>T</code>：通常表示 &quot;Type&quot;，表示泛型的類型參數。</li>
+<li><code>U</code>：通常用於表示第二個泛型類型參數。</li>
+<li><code>F</code>：通常表示 &quot;Function&quot;，用於表示接受或返回函數的泛型參數。</li>
+</ul>
+<p>這些僅僅是慣例，而不是強制的規則。當你閱讀其他人的代碼或寫自己的代碼時，習慣上使用這樣的字母可以讓代碼更容易閱讀和理解。</p>
+<pre><pre class="playground"><code class="language-rust">fn perform_operation&lt;Input, Output, Func&gt;(value: Input, operation: Func) -&gt; Output
+where
+    Func: Fn(Input) -&gt; Output,
+{
+    operation(value)
+}
+
+fn main() {
+    // 對整數進行操作
+    let result_int = perform_operation(5, |x| x * 2);
+    println!(&quot;Result for integer: {}&quot;, result_int);
+
+    // 對浮點數進行操作
+    let result_float = perform_operation(3.5, |x| x * 2.0);
+    println!(&quot;Result for float: {}&quot;, result_float);
+
+    // 對字串進行操作
+    let result_string = perform_operation(&quot;Hello&quot;, |x| format!(&quot;{}!&quot;, x));
+    println!(&quot;Result for string: {}&quot;, result_string);
+}
+</code></pre></pre>
+<h2 id="trait"><a class="header" href="#trait">trait</a></h2>
+<p>trait是一種定義共享行為的機制，它類似於其他語言中的接口（interface）。trait可以用於定義方法簽名，然後類型實現這些trait，以提供對這些方法的具體實現。</p>
+<p>以下是一個簡單的示例，演示了如何定義trait和實現它：</p>
+<pre><pre class="playground"><code class="language-rust">// 定義一個名為 Printable 的 trait
+trait Printable {
+    // 方法簽名，表示實現這個 trait 的類型需要實現 print 方法
+    fn print(&amp;self);
+}
+
+// 實現 Printable trait 的結構體
+struct Dog {
+    name: String,
+}
+
+// 實現 Printable trait 的結構體
+struct Cat {
+    name: String,
+}
+
+// 實現 Printable trait for Dog
+impl Printable for Dog {
+    // 實現 print 方法
+    fn print(&amp;self) {
+        println!(&quot;Dog named {}&quot;, self.name);
+    }
+}
+
+// 實現 Printable trait for Cat
+impl Printable for Cat {
+    // 實現 print 方法
+    fn print(&amp;self) {
+        println!(&quot;Cat named {}&quot;, self.name);
+    }
+}
+
+fn main() {
+    // 創建一個 Dog 實例
+    let dog = Dog { name: String::from(&quot;Buddy&quot;) };
+    // 呼叫 Printable trait 中的 print 方法
+    dog.print();
+
+    // 創建一個 Cat 實例
+    let cat = Cat { name: String::from(&quot;Whiskers&quot;) };
+    // 呼叫 Printable trait 中的 print 方法
+    cat.print();
+}
+</code></pre></pre>
+<ul>
+<li>我們定義了一個名為 <code>Printable</code> 的 trait，它包含一個方法 <code>print</code>。</li>
+<li>我們創建了兩個結構體 <code>Dog</code> 和 <code>Cat</code>。</li>
+<li>我們為每個結構體實現了 <code>Printable</code> trait，提供了對 <code>print</code> 方法的具體實現。</li>
+<li>在 <code>main</code> 函數中，我們創建了一個 <code>Dog</code> 實例和一個 <code>Cat</code> 實例，然後分別呼叫了它們的 <code>print</code> 方法。</li>
+</ul>
+<p>這就是trait的基本用法。trait還可以用於實現泛型，以及在函數中指定trait約束，這樣可以在不同類型上使用相同的trait方法。</p>
+<h2 id="trait-和泛型是-rust-中的兩個不同的概念但它們經常一起使用"><a class="header" href="#trait-和泛型是-rust-中的兩個不同的概念但它們經常一起使用">trait 和泛型是 Rust 中的兩個不同的概念，但它們經常一起使用。</a></h2>
+<p>泛型（Generics）是一種通用編程概念，它允許編寫可以處理多種不同類型的代碼而不失靈活性和安全性的方式。通過使用泛型，可以在函數、結構、列舉和方法等多種場景中創建通用的代碼。</p>
+<p><strong>範例：</strong></p>
+<pre><pre class="playground"><code class="language-rust">use std::fmt::Debug; // 引入 Debug trait
+
+fn print&lt;T: Debug&gt;(value: T) {
+    println!(&quot;Value: {:#?}&quot;, value);
+}
+
+fn main() {
+    print(5);
+    print(&quot;Hello&quot;);
+}
+</code></pre></pre>
+<p>這裡的 <code>print</code> 函數使用泛型，可以接受任何類型的參數。</p>
+<h3 id="trait-1"><a class="header" href="#trait-1">Trait：</a></h3>
+<p>Trait 定義了一組可以由類型實現的方法的集合，這樣就可以共享某種行為。Trait 提供了一種方式來描述類型之間的共同特徵。</p>
+<p><strong>範例：</strong></p>
+<pre><pre class="playground"><code class="language-rust">trait Printable {
+    fn print(&amp;self);
+}
+
+struct Dog {
+    name: String,
+}
+
+impl Printable for Dog {
+    fn print(&amp;self) {
+        println!(&quot;Dog named {}&quot;, self.name);
+    }
+}
+
+struct Cat {
+    name: String,
+}
+
+impl Printable for Cat {
+    fn print(&amp;self) {
+        println!(&quot;Cat named {}&quot;, self.name);
+    }
+}
+
+fn main() {
+    let dog = Dog {
+        name: String::from(&quot;Buddy&quot;),
+    };
+    dog.print();
+
+    let cat = Cat {
+        name: String::from(&quot;Whiskers&quot;),
+    };
+    cat.print();
+}
+</code></pre></pre>
+<p>在這裡，<code>Printable</code> 是一個 trait，<code>Dog</code> 和 <code>Cat</code> 結構體實現了這個 trait，提供了對 <code>print</code> 方法的具體實現。</p>
+<h3 id="結論"><a class="header" href="#結論">結論：</a></h3>
+<p>總體而言，泛型是一種更通用的編程概念，用於創建可以處理多種類型的代碼，而 trait 則用於描述類型之間的共同特徵，讓不同的類型可以共享某種行為。在實踐中，泛型和 trait 經常一起使用，使得代碼更加靈活和可擴展。</p>
 
                         <script src="https://utteranc.es/client.js"
                             repo="imxood/imxood.github.io"
