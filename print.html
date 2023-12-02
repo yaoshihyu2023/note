@@ -10987,6 +10987,80 @@ fn main() {
     println!(&quot;{}&quot;, cat_instance.speak()); // 输出: Whiskers says Meow!
 }
 </code></pre></pre>
+<h3 id="enum-跟-impl"><a class="header" href="#enum-跟-impl">enum 跟 impl</a></h3>
+<p>在這個例子中，我們使用了列舉 <code>Animal</code> 來表示不同類型的動物（狗和貓）。每個動物類型都有一個 <code>name</code> 欄位。我們通過在列舉上實現方法來模擬建構函式（<code>new_dog</code> 和 <code>new_cat</code>）和 <code>speak</code> 方法。在 <code>main</code> 函數中，我們建立了兩個不同類型的動物實例並呼叫了它們的 <code>speak</code> 方法。</p>
+<pre><pre class="playground"><code class="language-rust">// 定义一个枚举，表示不同类型的动物
+enum Animal {
+    Dog { name: String },
+    Cat { name: String },
+}
+
+// 枚举上的方法
+impl Animal {
+    // 构造函数
+    fn new_dog(name: &amp;str) -&gt; Self {
+        Animal::Dog { name: name.to_string() }
+    }
+
+    fn new_cat(name: &amp;str) -&gt; Self {
+        Animal::Cat { name: name.to_string() }
+    }
+
+    // 说话的方法
+    fn speak(&amp;self) -&gt; String {
+        match self {
+            Animal::Dog { name } =&gt; format!(&quot;{} says Woof!&quot;, name),
+            Animal::Cat { name } =&gt; format!(&quot;{} says Meow!&quot;, name),
+        }
+    }
+}
+
+fn main() {
+    // 创建实例并调用方法
+    let dog_instance = Animal::new_dog(&quot;Buddy&quot;);
+    let cat_instance = Animal::new_cat(&quot;Whiskers&quot;);
+
+    println!(&quot;{}&quot;, dog_instance.speak()); // 输出: Buddy says Woof!
+    println!(&quot;{}&quot;, cat_instance.speak()); // 输出: Whiskers says Meow!
+}
+</code></pre></pre>
+<h3 id="enum-跟-impl-1"><a class="header" href="#enum-跟-impl-1">enum 跟 impl</a></h3>
+<p>在這個例子中，我們使用了 <code>struct</code> 定義了 <code>Animal</code> 結構體，其中包含了 <code>kind</code> 表示動物的種類（&quot;Dog&quot; 或 &quot;Cat&quot;），以及 <code>name</code> 表示動物的名字。建構函式 <code>new</code> 用於建立新的 <code>Animal</code> 實例，而 <code>speak</code> 方法根據動物的種類輸出不同的聲音。在 <code>main</code> 函數中，我們建立了兩個不同類型的動物實例並呼叫了它們的 <code>speak</code> 方法。</p>
+<pre><pre class="playground"><code class="language-rust">// 定义结构体
+struct Animal {
+    kind: String,
+    name: String,
+}
+
+// Animal 结构体的方法
+impl Animal {
+    // 构造函数
+    fn new(kind: &amp;str, name: &amp;str) -&gt; Self {
+        Animal {
+            kind: kind.to_string(),
+            name: name.to_string(),
+        }
+    }
+
+    // 说话的方法
+    fn speak(&amp;self) -&gt; String {
+        match self.kind.as_str() {
+            &quot;Dog&quot; =&gt; format!(&quot;{} says Woof!&quot;, self.name),
+            &quot;Cat&quot; =&gt; format!(&quot;{} says Meow!&quot;, self.name),
+            _ =&gt; format!(&quot;Unknown animal&quot;),
+        }
+    }
+}
+
+fn main() {
+    // 创建实例并调用方法
+    let dog_instance = Animal::new(&quot;Dog&quot;, &quot;Buddy&quot;);
+    let cat_instance = Animal::new(&quot;Cat&quot;, &quot;Whiskers&quot;);
+
+    println!(&quot;{}&quot;, dog_instance.speak()); // 输出: Buddy says Woof!
+    println!(&quot;{}&quot;, cat_instance.speak()); // 输出: Whiskers says Meow!
+}
+</code></pre></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="rust-基本教學"><a class="header" href="#rust-基本教學">Rust 基本教學</a></h1>
 <h2 id="hello-world"><a class="header" href="#hello-world">Hello World!</a></h2>
 <h3 id="不使用管理工具編寫程式"><a class="header" href="#不使用管理工具編寫程式">不使用管理工具編寫程式</a></h3>
@@ -33407,6 +33481,80 @@ fn main() {
     // 创建实例并调用方法
     let dog_instance = Dog::new(&quot;Buddy&quot;);
     let cat_instance = Cat::new(&quot;Whiskers&quot;);
+
+    println!(&quot;{}&quot;, dog_instance.speak()); // 输出: Buddy says Woof!
+    println!(&quot;{}&quot;, cat_instance.speak()); // 输出: Whiskers says Meow!
+}
+</code></pre></pre>
+<h3 id="enum-跟-impl-2"><a class="header" href="#enum-跟-impl-2">enum 跟 impl</a></h3>
+<p>在這個例子中，我們使用了列舉 <code>Animal</code> 來表示不同類型的動物（狗和貓）。每個動物類型都有一個 <code>name</code> 欄位。我們通過在列舉上實現方法來模擬建構函式（<code>new_dog</code> 和 <code>new_cat</code>）和 <code>speak</code> 方法。在 <code>main</code> 函數中，我們建立了兩個不同類型的動物實例並呼叫了它們的 <code>speak</code> 方法。</p>
+<pre><pre class="playground"><code class="language-rust">// 定义一个枚举，表示不同类型的动物
+enum Animal {
+    Dog { name: String },
+    Cat { name: String },
+}
+
+// 枚举上的方法
+impl Animal {
+    // 构造函数
+    fn new_dog(name: &amp;str) -&gt; Self {
+        Animal::Dog { name: name.to_string() }
+    }
+
+    fn new_cat(name: &amp;str) -&gt; Self {
+        Animal::Cat { name: name.to_string() }
+    }
+
+    // 说话的方法
+    fn speak(&amp;self) -&gt; String {
+        match self {
+            Animal::Dog { name } =&gt; format!(&quot;{} says Woof!&quot;, name),
+            Animal::Cat { name } =&gt; format!(&quot;{} says Meow!&quot;, name),
+        }
+    }
+}
+
+fn main() {
+    // 创建实例并调用方法
+    let dog_instance = Animal::new_dog(&quot;Buddy&quot;);
+    let cat_instance = Animal::new_cat(&quot;Whiskers&quot;);
+
+    println!(&quot;{}&quot;, dog_instance.speak()); // 输出: Buddy says Woof!
+    println!(&quot;{}&quot;, cat_instance.speak()); // 输出: Whiskers says Meow!
+}
+</code></pre></pre>
+<h3 id="enum-跟-impl-3"><a class="header" href="#enum-跟-impl-3">enum 跟 impl</a></h3>
+<p>在這個例子中，我們使用了 <code>struct</code> 定義了 <code>Animal</code> 結構體，其中包含了 <code>kind</code> 表示動物的種類（&quot;Dog&quot; 或 &quot;Cat&quot;），以及 <code>name</code> 表示動物的名字。建構函式 <code>new</code> 用於建立新的 <code>Animal</code> 實例，而 <code>speak</code> 方法根據動物的種類輸出不同的聲音。在 <code>main</code> 函數中，我們建立了兩個不同類型的動物實例並呼叫了它們的 <code>speak</code> 方法。</p>
+<pre><pre class="playground"><code class="language-rust">// 定义结构体
+struct Animal {
+    kind: String,
+    name: String,
+}
+
+// Animal 结构体的方法
+impl Animal {
+    // 构造函数
+    fn new(kind: &amp;str, name: &amp;str) -&gt; Self {
+        Animal {
+            kind: kind.to_string(),
+            name: name.to_string(),
+        }
+    }
+
+    // 说话的方法
+    fn speak(&amp;self) -&gt; String {
+        match self.kind.as_str() {
+            &quot;Dog&quot; =&gt; format!(&quot;{} says Woof!&quot;, self.name),
+            &quot;Cat&quot; =&gt; format!(&quot;{} says Meow!&quot;, self.name),
+            _ =&gt; format!(&quot;Unknown animal&quot;),
+        }
+    }
+}
+
+fn main() {
+    // 创建实例并调用方法
+    let dog_instance = Animal::new(&quot;Dog&quot;, &quot;Buddy&quot;);
+    let cat_instance = Animal::new(&quot;Cat&quot;, &quot;Whiskers&quot;);
 
     println!(&quot;{}&quot;, dog_instance.speak()); // 输出: Buddy says Woof!
     println!(&quot;{}&quot;, cat_instance.speak()); // 输出: Whiskers says Meow!
