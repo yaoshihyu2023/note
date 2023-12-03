@@ -11099,6 +11099,52 @@ fn main() {
     println!(&quot;New point location: ({}, {})&quot;, point3.x, point3.y);
 }
 </code></pre></pre>
+<h2 id="async-await-spawn-用法"><a class="header" href="#async-await-spawn-用法">Async Await spawn 用法</a></h2>
+<pre><pre class="playground"><code class="language-rust">use tokio::time::{sleep, Duration};
+
+// 异步函数
+async fn async_function(id: usize) {
+    println!(&quot;Start of async function {}&quot;, id);
+
+    // 模拟异步操作，例如 I/O 操作
+    sleep(Duration::from_secs(2)).await;
+
+    println!(&quot;End of async function {}&quot;, id);
+}
+
+// 您可以一次連續呼叫 async_function 多次。在非同步程式設計中，您可以使用 tokio::spawn 或其他類似的功能來並行執行多個非同步任務。下面是一個例子，演示如何連續呼叫 async_function 5 次
+#[tokio::main]
+async fn main() {
+    println!(&quot;Start of main function&quot;);
+
+    // 创建一个 Vec 来存储任务句柄
+    let mut handles = Vec::new();
+
+    // 调用 async_function 5 次
+    for i in 0..5 {
+        // 使用 tokio::spawn 启动异步任务，并将任务句柄存储在 Vec 中
+        let handle = tokio::spawn(async_function(i));
+        handles.push(handle);
+    }
+
+    // 等待所有任务完成
+    for handle in handles {
+        handle.await.expect(&quot;Failed to await task&quot;);
+    }
+
+    println!(&quot;End of main function&quot;);
+}
+</code></pre></pre>
+<pre><code class="language-toml">[package]
+name = &quot;rust_async_test&quot;
+version = &quot;0.1.0&quot;
+edition = &quot;2021&quot;
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+tokio = { version = &quot;1&quot;, features = [&quot;full&quot;] }
+</code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="rust-基本教學"><a class="header" href="#rust-基本教學">Rust 基本教學</a></h1>
 <h2 id="hello-world"><a class="header" href="#hello-world">Hello World!</a></h2>
 <h3 id="不使用管理工具編寫程式"><a class="header" href="#不使用管理工具編寫程式">不使用管理工具編寫程式</a></h3>
@@ -33636,6 +33682,52 @@ fn main() {
     println!(&quot;New point location: ({}, {})&quot;, point3.x, point3.y);
 }
 </code></pre></pre>
+<h2 id="async-await-spawn-用法-1"><a class="header" href="#async-await-spawn-用法-1">Async Await spawn 用法</a></h2>
+<pre><pre class="playground"><code class="language-rust">use tokio::time::{sleep, Duration};
+
+// 异步函数
+async fn async_function(id: usize) {
+    println!(&quot;Start of async function {}&quot;, id);
+
+    // 模拟异步操作，例如 I/O 操作
+    sleep(Duration::from_secs(2)).await;
+
+    println!(&quot;End of async function {}&quot;, id);
+}
+
+// 您可以一次連續呼叫 async_function 多次。在非同步程式設計中，您可以使用 tokio::spawn 或其他類似的功能來並行執行多個非同步任務。下面是一個例子，演示如何連續呼叫 async_function 5 次
+#[tokio::main]
+async fn main() {
+    println!(&quot;Start of main function&quot;);
+
+    // 创建一个 Vec 来存储任务句柄
+    let mut handles = Vec::new();
+
+    // 调用 async_function 5 次
+    for i in 0..5 {
+        // 使用 tokio::spawn 启动异步任务，并将任务句柄存储在 Vec 中
+        let handle = tokio::spawn(async_function(i));
+        handles.push(handle);
+    }
+
+    // 等待所有任务完成
+    for handle in handles {
+        handle.await.expect(&quot;Failed to await task&quot;);
+    }
+
+    println!(&quot;End of main function&quot;);
+}
+</code></pre></pre>
+<pre><code class="language-toml">[package]
+name = &quot;rust_async_test&quot;
+version = &quot;0.1.0&quot;
+edition = &quot;2021&quot;
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+tokio = { version = &quot;1&quot;, features = [&quot;full&quot;] }
+</code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="30-天深入淺出-rust系列"><a class="header" href="#30-天深入淺出-rust系列"><a href="https://ithelp.ithome.com.tw/users/20111802/ironman/1742">30 天深入淺出 Rust</a>系列</a></h1>
 <p>https://ithelp.ithome.com.tw/articles/10199503</p>
 <p>這系列會假設你有基礎的程式能力，不管是什麼語言都行，至少知道一下比如「參考 (reference) 」是什麼，雖說我也會盡量以初學程式的角度講解，只是 Rust 這個語言本身就包含了不少比較進階的觀念，加上我很可能會舉其它程式語言當對照，同時本系列會以類 Unix (Linux, Mac) 的環境為主，如果你使用的是 Windows 大部份情況下應該不會有什麼問題。</p>
