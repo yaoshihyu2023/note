@@ -11145,6 +11145,50 @@ edition = &quot;2021&quot;
 [dependencies]
 tokio = { version = &quot;1&quot;, features = [&quot;full&quot;] }
 </code></pre>
+<h3 id="into"><a class="header" href="#into">into</a></h3>
+<p><code>Into</code> trait 是一種常見的用於類型轉換的 trait，但並不是唯一的方式。Rust 還提供了一種簡化類型轉換的手段，即使用 <code>Into</code> trait 的 <code>into</code> 方法。</p>
+<p>在 Rust 中，對於任何實現了 <code>From</code> trait 的類型，都可以使用 <code>into</code> 方法進行類型轉換。這是因為 <code>Into</code> trait 是 <code>From</code> trait 的逆。具體來說，<code>Into&lt;T&gt;</code> trait 的實現是由 <code>T</code> 實現的 <code>From&lt;U&gt;</code> trait 決定的。</p>
+<pre><pre class="playground"><code class="language-rust">// 定義一個結構 Point
+struct Point {
+    x: i32,
+    y: i32,
+}
+
+// 實現 Into&lt;T&gt; trait for Point
+impl Into&lt;(i32, i32)&gt; for Point {
+    fn into(self) -&gt; (i32, i32) {
+        (self.x, self.y)
+    }
+}
+
+fn main() {
+    // 創建一個 Point 實例
+    let point = Point { x: 10, y: 20 };
+
+    // 使用 .into() 將 Point 轉換成 (i32, i32)
+    let tuple: (i32, i32) = point.into();
+
+    // 打印轉換後的結果
+    println!(&quot;Tuple: {:?}&quot;, tuple);
+}
+</code></pre></pre>
+<pre><pre class="playground"><code class="language-rust">// 定義一個結構 Point
+struct Point {
+    x: i32,
+    y: i32,
+}
+
+fn main() {
+    // 創建一個 Point 實例
+    let point = Point { x: 10, y: 20 };
+
+    // 使用 .into() 將 Point 轉換成 (i32, i32)
+    let tuple: (i32, i32) = point.into();
+
+    // 打印轉換後的結果
+    println!(&quot;Tuple: {:?}&quot;, tuple);
+}
+</code></pre></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="rust-基本教學"><a class="header" href="#rust-基本教學">Rust 基本教學</a></h1>
 <h2 id="hello-world"><a class="header" href="#hello-world">Hello World!</a></h2>
 <h3 id="不使用管理工具編寫程式"><a class="header" href="#不使用管理工具編寫程式">不使用管理工具編寫程式</a></h3>
@@ -33728,6 +33772,50 @@ edition = &quot;2021&quot;
 [dependencies]
 tokio = { version = &quot;1&quot;, features = [&quot;full&quot;] }
 </code></pre>
+<h3 id="into-1"><a class="header" href="#into-1">into</a></h3>
+<p><code>Into</code> trait 是一種常見的用於類型轉換的 trait，但並不是唯一的方式。Rust 還提供了一種簡化類型轉換的手段，即使用 <code>Into</code> trait 的 <code>into</code> 方法。</p>
+<p>在 Rust 中，對於任何實現了 <code>From</code> trait 的類型，都可以使用 <code>into</code> 方法進行類型轉換。這是因為 <code>Into</code> trait 是 <code>From</code> trait 的逆。具體來說，<code>Into&lt;T&gt;</code> trait 的實現是由 <code>T</code> 實現的 <code>From&lt;U&gt;</code> trait 決定的。</p>
+<pre><pre class="playground"><code class="language-rust">// 定義一個結構 Point
+struct Point {
+    x: i32,
+    y: i32,
+}
+
+// 實現 Into&lt;T&gt; trait for Point
+impl Into&lt;(i32, i32)&gt; for Point {
+    fn into(self) -&gt; (i32, i32) {
+        (self.x, self.y)
+    }
+}
+
+fn main() {
+    // 創建一個 Point 實例
+    let point = Point { x: 10, y: 20 };
+
+    // 使用 .into() 將 Point 轉換成 (i32, i32)
+    let tuple: (i32, i32) = point.into();
+
+    // 打印轉換後的結果
+    println!(&quot;Tuple: {:?}&quot;, tuple);
+}
+</code></pre></pre>
+<pre><pre class="playground"><code class="language-rust">// 定義一個結構 Point
+struct Point {
+    x: i32,
+    y: i32,
+}
+
+fn main() {
+    // 創建一個 Point 實例
+    let point = Point { x: 10, y: 20 };
+
+    // 使用 .into() 將 Point 轉換成 (i32, i32)
+    let tuple: (i32, i32) = point.into();
+
+    // 打印轉換後的結果
+    println!(&quot;Tuple: {:?}&quot;, tuple);
+}
+</code></pre></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="30-天深入淺出-rust系列"><a class="header" href="#30-天深入淺出-rust系列"><a href="https://ithelp.ithome.com.tw/users/20111802/ironman/1742">30 天深入淺出 Rust</a>系列</a></h1>
 <p>https://ithelp.ithome.com.tw/articles/10199503</p>
 <p>這系列會假設你有基礎的程式能力，不管是什麼語言都行，至少知道一下比如「參考 (reference) 」是什麼，雖說我也會盡量以初學程式的角度講解，只是 Rust 這個語言本身就包含了不少比較進階的觀念，加上我很可能會舉其它程式語言當對照，同時本系列會以類 Unix (Linux, Mac) 的環境為主，如果你使用的是 Windows 大部份情況下應該不會有什麼問題。</p>
