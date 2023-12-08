@@ -11189,6 +11189,204 @@ fn main() {
     println!(&quot;Tuple: {:?}&quot;, tuple);
 }
 </code></pre></pre>
+<p>struct 用於定義結構體（structure），即一種用來組織和存儲數據的自定義類型。而 trait 則用於定義接口，即一組方法的集合，這些方法可以被實現在各種不同的類型上。</p>
+<pre><pre class="playground"><code class="language-rust">// 定義特徵 Displayable
+trait Displayable {
+    fn display(&amp;self);
+}
+
+// 實現特徵 Displayable for Point
+struct Point {
+    x: f64,
+    y: f64,
+}
+
+impl Displayable for Point {
+    fn display(&amp;self) {
+        println!(&quot;Point: ({}, {})&quot;, self.x, self.y);
+    }
+}
+
+// 實現特徵 Displayable for Circle
+struct Circle {
+    radius: f64,
+}
+
+impl Displayable for Circle {
+    fn display(&amp;self) {
+        println!(&quot;Circle with radius: {}&quot;, self.radius);
+    }
+}
+
+// 定義特徵 Add
+trait Add {
+    fn add(&amp;self, other: &amp;Self) -&gt; Self;
+}
+
+// 實現特徵 Add for i32
+impl Add for i32 {
+    fn add(&amp;self, other: &amp;Self) -&gt; Self {
+        *self + *other
+    }
+}
+
+// 實現特徵 Add for f64
+impl Add for f64 {
+    fn add(&amp;self, other: &amp;Self) -&gt; Self {
+        *self + *other
+    }
+}
+
+// 定義特徵 Double
+trait Double {
+    fn double(&amp;self) -&gt; Self;
+}
+
+// 實現特徵 Double for i32
+impl Double for i32 {
+    fn double(&amp;self) -&gt; Self {
+        *self * 2
+    }
+}
+
+// 實現特徵 Double for f64
+impl Double for f64 {
+    fn double(&amp;self) -&gt; Self {
+        *self * 2.0
+    }
+}
+
+// 主函數
+fn main() {
+    // 使用 Displayable 特徵的方法
+    let point = Point { x: 1.0, y: 2.0 };
+    point.display();
+
+    let circle = Circle { radius: 3.0 };
+    circle.display();
+
+    // 使用 Add 特徵的方法
+    let sum_i32 = 10i32.add(&amp;5);
+    let sum_f64 = 3.5f64.add(&amp;2.5);
+
+    println!(&quot;Sum of i32: {}&quot;, sum_i32);
+    println!(&quot;Sum of f64: {}&quot;, sum_f64);
+
+    // 使用 Double 特徵的方法
+    let doubled_i32 = 7i32.double();
+    let doubled_f64 = 4.2f64.double();
+
+    println!(&quot;Doubled i32: {}&quot;, doubled_i32);
+    println!(&quot;Doubled f64: {}&quot;, doubled_f64);
+}
+</code></pre></pre>
+<pre><pre class="playground"><code class="language-rust">// 定義特徵 Add
+trait Add {
+    fn add(&amp;self, other: &amp;Self) -&gt; Self;
+}
+
+// 實現特徵 Add for i32
+impl Add for i32 {
+    fn add(&amp;self, other: &amp;Self) -&gt; Self {
+        *self + *other
+    }
+}
+
+// 實現特徵 Add for f64
+impl Add for f64 {
+    fn add(&amp;self, other: &amp;Self) -&gt; Self {
+        *self + *other
+    }
+}
+
+// 主函數
+fn main() {
+    // 使用 Add 特徵的方法
+    let sum_i32 = 10i32.add(&amp;5);
+    let sum_f64 = 3.5f64.add(&amp;2.5);
+
+    println!(&quot;Sum of i32: {}&quot;, sum_i32);
+    println!(&quot;Sum of f64: {}&quot;, sum_f64);
+}
+</code></pre></pre>
+<h2 id="多型polymorphism"><a class="header" href="#多型polymorphism">多型（polymorphism）</a></h2>
+<p>在 Rust 中通常是通過 trait 和泛型實現的。下面是一個簡單的多型範例，其中使用了 trait 和泛型，允許一個函數接受不同類型的參數：</p>
+<pre><pre class="playground"><code class="language-rust">// 定義一個特徵 Display
+trait Display {
+    fn display(&amp;self);
+}
+
+// 實現 Display 特徵的結構體 Point
+struct Point {
+    x: f64,
+    y: f64,
+}
+
+impl Display for Point {
+    fn display(&amp;self) {
+        println!(&quot;Point: ({}, {})&quot;, self.x, self.y);
+    }
+}
+
+// 實現 Display 特徵的結構體 Circle
+struct Circle {
+    radius: f64,
+}
+
+impl Display for Circle {
+    fn display(&amp;self) {
+        println!(&quot;Circle with radius: {}&quot;, self.radius);
+    }
+}
+
+// 多型函數，接受實現 Display 特徵的任意類型
+fn show_displayable&lt;T: Display&gt;(item: T) {
+    item.display();
+}
+
+fn main() {
+    let point = Point { x: 1.0, y: 2.0 };
+    let circle = Circle { radius: 3.0 };
+
+    // 調用多型函數，可以接受不同類型的參數
+    show_displayable(point);
+    show_displayable(circle);
+}
+</code></pre></pre>
+<h2 id="泛型"><a class="header" href="#泛型">泛型</a></h2>
+<pre><pre class="playground"><code class="language-rust">// 定義一個泛型函數，接受兩個參數並返回它們的和
+fn add&lt;T&gt;(a: T, b: T) -&gt; T
+where
+    T: std::ops::Add&lt;Output = T&gt;,
+{
+    a + b
+}
+
+fn main() {
+    // 使用泛型函數，可以處理不同類型的數據
+    let sum_i32 = add(5, 3);
+    let sum_f64 = add(3.5, 2.5);
+
+    println!(&quot;Sum of i32: {}&quot;, sum_i32);
+    println!(&quot;Sum of f64: {}&quot;, sum_f64);
+}
+</code></pre></pre>
+<p>在這個範例中，<code>add</code> 函數是一個泛型函數，它接受兩個相同類型的參數 <code>a</code> 和 <code>b</code>，並返回它們的和。泛型參數 <code>T</code> 表示可以是任何類型。<code>where T: std::ops::Add&lt;Output = T&gt;</code> 確保 <code>T</code> 實現了 <code>Add</code> trait，並指定了 <code>Output</code> 類型為 <code>T</code>。</p>
+<p>在 <code>main</code> 函數中，我們分別使用整數和浮點數調用了 <code>add</code> 函數，顯示了泛型函數可以處理不同類型的數據並返回正確的結果。</p>
+<p>在上述的泛型範例中，<code>where T: std::ops::Add&lt;Output = T&gt;</code> 是一個泛型約束（generic constraint）子句，用於指定泛型參數 <code>T</code> 必須滿足的條件。</p>
+<p>這個約束的意義是，泛型參數 <code>T</code> 必須實現 <code>std::ops::Add</code> trait，並且其 <code>Add</code> 實現的輸出類型（Output）必須是 <code>T</code>。換句話說，<code>T</code> 只能與自己相加，而不是與其他類型相加。</p>
+<p>這樣的約束確保了 <code>add</code> 函數在編譯時期只能被用於那些支持 <code>+</code> 運算的類型，並保證了在編譯時期就能夠確定 <code>add</code> 函數的行為。</p>
+<p>不使用 <code>where</code> 子句的版本可能看起來像這樣：</p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>fn add&lt;T: std::ops::Add&lt;Output = T&gt;&gt;(a: T, b: T) -&gt; T {
+    a + b
+}
+<span class="boring">}
+</span></code></pre></pre>
+<p><code>where</code> 子句的存在讓約束條件更為清晰，有時可以提高代碼的可讀性，特別是當約束條件較長或較複雜時。這種寫法的主要優勢是可以將約束從函數的簽名中分離出來，讓簽名更加簡潔。</p>
+<p>總體而言，<code>where</code> 子句的使用是為了確定泛型參數滿足特定的條件，提高代碼的可讀性和可維護性。</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="rust-基本教學"><a class="header" href="#rust-基本教學">Rust 基本教學</a></h1>
 <h2 id="hello-world"><a class="header" href="#hello-world">Hello World!</a></h2>
 <h3 id="不使用管理工具編寫程式"><a class="header" href="#不使用管理工具編寫程式">不使用管理工具編寫程式</a></h3>
@@ -12555,7 +12753,7 @@ ex:</li>
     println!(&quot;{}&quot;, x.parse::&lt;i32&gt;().unwrap());
 }
 </code></pre></pre>
-<h2 id="泛型"><a class="header" href="#泛型">泛型</a></h2>
+<h2 id="泛型-1"><a class="header" href="#泛型-1">泛型</a></h2>
 <ul>
 <li>用這樣的語法<code>&lt;T&gt;</code>宣告泛型
 ex:</li>
@@ -13478,7 +13676,7 @@ fn main() { // 若無回傳型別，rust 會自動加上 -&gt; ()
 }
 </code></pre></pre>
 <p>這看起來好像沒什麼用，畢竟 0-tuple 什麼事都做不了。然而，當你要寫泛型函式 (generic function) 時，你會跪在電腦前感謝這個設計。</p>
-<h2 id="泛型-1"><a class="header" href="#泛型-1">泛型</a></h2>
+<h2 id="泛型-2"><a class="header" href="#泛型-2">泛型</a></h2>
 <p>如同 C++ 那般，Rust 也可以利用模版 (template) 來達成泛型程式設計，語法也非常接近 C++：</p>
 <pre><pre class="playground"><code class="language-rust">struct Point&lt;T&gt; { // 相當於 template&lt;typename T&gt; struct Point
     x: T,
@@ -18670,7 +18868,7 @@ fn main() {
 }
 </code></pre></pre>
 <p>所以只要記住:當你使用<code>.</code>運算符時，你不需要擔心<code>*</code>。</p>
-<h2 id="泛型-2"><a class="header" href="#泛型-2">泛型</a></h2>
+<h2 id="泛型-3"><a class="header" href="#泛型-3">泛型</a></h2>
 <p>在函數中，你要寫出採取什麼類型作為輸入。</p>
 <pre><pre class="playground"><code class="language-rust">fn return_number(number: i32) -&gt; i32 {
     println!(&quot;Here is your number.&quot;);
@@ -31926,7 +32124,7 @@ Color c = Color::Green;
 let c = Color::Green;
 <span class="boring">}
 </span></code></pre></pre>
-<h3 id="泛型-3"><a class="header" href="#泛型-3">泛型</a></h3>
+<h3 id="泛型-4"><a class="header" href="#泛型-4">泛型</a></h3>
 <p>在C ++中，泛型是一種將代碼寫成可以處理多種數據類型的方式。</p>
 <pre><code class="language-cpp">template &lt;typename T&gt;
 T max(T a, T b) {
@@ -33816,6 +34014,204 @@ fn main() {
     println!(&quot;Tuple: {:?}&quot;, tuple);
 }
 </code></pre></pre>
+<p>struct 用於定義結構體（structure），即一種用來組織和存儲數據的自定義類型。而 trait 則用於定義接口，即一組方法的集合，這些方法可以被實現在各種不同的類型上。</p>
+<pre><pre class="playground"><code class="language-rust">// 定義特徵 Displayable
+trait Displayable {
+    fn display(&amp;self);
+}
+
+// 實現特徵 Displayable for Point
+struct Point {
+    x: f64,
+    y: f64,
+}
+
+impl Displayable for Point {
+    fn display(&amp;self) {
+        println!(&quot;Point: ({}, {})&quot;, self.x, self.y);
+    }
+}
+
+// 實現特徵 Displayable for Circle
+struct Circle {
+    radius: f64,
+}
+
+impl Displayable for Circle {
+    fn display(&amp;self) {
+        println!(&quot;Circle with radius: {}&quot;, self.radius);
+    }
+}
+
+// 定義特徵 Add
+trait Add {
+    fn add(&amp;self, other: &amp;Self) -&gt; Self;
+}
+
+// 實現特徵 Add for i32
+impl Add for i32 {
+    fn add(&amp;self, other: &amp;Self) -&gt; Self {
+        *self + *other
+    }
+}
+
+// 實現特徵 Add for f64
+impl Add for f64 {
+    fn add(&amp;self, other: &amp;Self) -&gt; Self {
+        *self + *other
+    }
+}
+
+// 定義特徵 Double
+trait Double {
+    fn double(&amp;self) -&gt; Self;
+}
+
+// 實現特徵 Double for i32
+impl Double for i32 {
+    fn double(&amp;self) -&gt; Self {
+        *self * 2
+    }
+}
+
+// 實現特徵 Double for f64
+impl Double for f64 {
+    fn double(&amp;self) -&gt; Self {
+        *self * 2.0
+    }
+}
+
+// 主函數
+fn main() {
+    // 使用 Displayable 特徵的方法
+    let point = Point { x: 1.0, y: 2.0 };
+    point.display();
+
+    let circle = Circle { radius: 3.0 };
+    circle.display();
+
+    // 使用 Add 特徵的方法
+    let sum_i32 = 10i32.add(&amp;5);
+    let sum_f64 = 3.5f64.add(&amp;2.5);
+
+    println!(&quot;Sum of i32: {}&quot;, sum_i32);
+    println!(&quot;Sum of f64: {}&quot;, sum_f64);
+
+    // 使用 Double 特徵的方法
+    let doubled_i32 = 7i32.double();
+    let doubled_f64 = 4.2f64.double();
+
+    println!(&quot;Doubled i32: {}&quot;, doubled_i32);
+    println!(&quot;Doubled f64: {}&quot;, doubled_f64);
+}
+</code></pre></pre>
+<pre><pre class="playground"><code class="language-rust">// 定義特徵 Add
+trait Add {
+    fn add(&amp;self, other: &amp;Self) -&gt; Self;
+}
+
+// 實現特徵 Add for i32
+impl Add for i32 {
+    fn add(&amp;self, other: &amp;Self) -&gt; Self {
+        *self + *other
+    }
+}
+
+// 實現特徵 Add for f64
+impl Add for f64 {
+    fn add(&amp;self, other: &amp;Self) -&gt; Self {
+        *self + *other
+    }
+}
+
+// 主函數
+fn main() {
+    // 使用 Add 特徵的方法
+    let sum_i32 = 10i32.add(&amp;5);
+    let sum_f64 = 3.5f64.add(&amp;2.5);
+
+    println!(&quot;Sum of i32: {}&quot;, sum_i32);
+    println!(&quot;Sum of f64: {}&quot;, sum_f64);
+}
+</code></pre></pre>
+<h2 id="多型polymorphism-1"><a class="header" href="#多型polymorphism-1">多型（polymorphism）</a></h2>
+<p>在 Rust 中通常是通過 trait 和泛型實現的。下面是一個簡單的多型範例，其中使用了 trait 和泛型，允許一個函數接受不同類型的參數：</p>
+<pre><pre class="playground"><code class="language-rust">// 定義一個特徵 Display
+trait Display {
+    fn display(&amp;self);
+}
+
+// 實現 Display 特徵的結構體 Point
+struct Point {
+    x: f64,
+    y: f64,
+}
+
+impl Display for Point {
+    fn display(&amp;self) {
+        println!(&quot;Point: ({}, {})&quot;, self.x, self.y);
+    }
+}
+
+// 實現 Display 特徵的結構體 Circle
+struct Circle {
+    radius: f64,
+}
+
+impl Display for Circle {
+    fn display(&amp;self) {
+        println!(&quot;Circle with radius: {}&quot;, self.radius);
+    }
+}
+
+// 多型函數，接受實現 Display 特徵的任意類型
+fn show_displayable&lt;T: Display&gt;(item: T) {
+    item.display();
+}
+
+fn main() {
+    let point = Point { x: 1.0, y: 2.0 };
+    let circle = Circle { radius: 3.0 };
+
+    // 調用多型函數，可以接受不同類型的參數
+    show_displayable(point);
+    show_displayable(circle);
+}
+</code></pre></pre>
+<h2 id="泛型-5"><a class="header" href="#泛型-5">泛型</a></h2>
+<pre><pre class="playground"><code class="language-rust">// 定義一個泛型函數，接受兩個參數並返回它們的和
+fn add&lt;T&gt;(a: T, b: T) -&gt; T
+where
+    T: std::ops::Add&lt;Output = T&gt;,
+{
+    a + b
+}
+
+fn main() {
+    // 使用泛型函數，可以處理不同類型的數據
+    let sum_i32 = add(5, 3);
+    let sum_f64 = add(3.5, 2.5);
+
+    println!(&quot;Sum of i32: {}&quot;, sum_i32);
+    println!(&quot;Sum of f64: {}&quot;, sum_f64);
+}
+</code></pre></pre>
+<p>在這個範例中，<code>add</code> 函數是一個泛型函數，它接受兩個相同類型的參數 <code>a</code> 和 <code>b</code>，並返回它們的和。泛型參數 <code>T</code> 表示可以是任何類型。<code>where T: std::ops::Add&lt;Output = T&gt;</code> 確保 <code>T</code> 實現了 <code>Add</code> trait，並指定了 <code>Output</code> 類型為 <code>T</code>。</p>
+<p>在 <code>main</code> 函數中，我們分別使用整數和浮點數調用了 <code>add</code> 函數，顯示了泛型函數可以處理不同類型的數據並返回正確的結果。</p>
+<p>在上述的泛型範例中，<code>where T: std::ops::Add&lt;Output = T&gt;</code> 是一個泛型約束（generic constraint）子句，用於指定泛型參數 <code>T</code> 必須滿足的條件。</p>
+<p>這個約束的意義是，泛型參數 <code>T</code> 必須實現 <code>std::ops::Add</code> trait，並且其 <code>Add</code> 實現的輸出類型（Output）必須是 <code>T</code>。換句話說，<code>T</code> 只能與自己相加，而不是與其他類型相加。</p>
+<p>這樣的約束確保了 <code>add</code> 函數在編譯時期只能被用於那些支持 <code>+</code> 運算的類型，並保證了在編譯時期就能夠確定 <code>add</code> 函數的行為。</p>
+<p>不使用 <code>where</code> 子句的版本可能看起來像這樣：</p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>fn add&lt;T: std::ops::Add&lt;Output = T&gt;&gt;(a: T, b: T) -&gt; T {
+    a + b
+}
+<span class="boring">}
+</span></code></pre></pre>
+<p><code>where</code> 子句的存在讓約束條件更為清晰，有時可以提高代碼的可讀性，特別是當約束條件較長或較複雜時。這種寫法的主要優勢是可以將約束從函數的簽名中分離出來，讓簽名更加簡潔。</p>
+<p>總體而言，<code>where</code> 子句的使用是為了確定泛型參數滿足特定的條件，提高代碼的可讀性和可維護性。</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="30-天深入淺出-rust系列"><a class="header" href="#30-天深入淺出-rust系列"><a href="https://ithelp.ithome.com.tw/users/20111802/ironman/1742">30 天深入淺出 Rust</a>系列</a></h1>
 <p>https://ithelp.ithome.com.tw/articles/10199503</p>
 <p>這系列會假設你有基礎的程式能力，不管是什麼語言都行，至少知道一下比如「參考 (reference) 」是什麼，雖說我也會盡量以初學程式的角度講解，只是 Rust 這個語言本身就包含了不少比較進階的觀念，加上我很可能會舉其它程式語言當對照，同時本系列會以類 Unix (Linux, Mac) 的環境為主，如果你使用的是 Windows 大部份情況下應該不會有什麼問題。</p>
@@ -35024,7 +35420,7 @@ Point {
 <p><code>Copy</code> 是代表這個型態可以被簡單的複製，這通常代表你的型態裡只有包含像數字或是布林等型態的資料，如果包含了 <code>String</code> 或 <code>Vec</code> 就沒辦法實作這個 trait，另外如果有實作 <code>Copy</code> 則一定要實作 <code>Clone</code>。</p>
 <h3 id="clone"><a class="header" href="#clone">Clone</a></h3>
 <p><a href="https://doc.rust-lang.org/stable/std/clone/trait.Clone.html"><code>std::clone::Clone</code></a> 是可被複製的型態，如果一個型態只有 <code>Clone</code> 而沒有 <code>Copy</code> 則通常代表這個型態的複製是需要成本的，比如 <code>String</code>，大部份的型態也都有實作 <code>Clone</code> ，如果你的型態允許複製也請務必實作 <code>Clone</code>，至於沒有實作 <code>Clone</code> 的型態基本上就是像 <code>File</code> 之類的因為它是對應到了一個實際存在的檔案。</p>
-<h2 id="泛型-4"><a class="header" href="#泛型-4">泛型</a></h2>
+<h2 id="泛型-6"><a class="header" href="#泛型-6">泛型</a></h2>
 <p>如果沒有泛型實際上 trait 也沒什麼作用，泛型可以讓一個函式接受不同型態的參數，同時透過指定要實作的 trait 來確保傳進來的參數一定滿足某些必要的條件，比如我想要傳進來的數字可以跟數字相加，而且回傳數字：</p>
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
