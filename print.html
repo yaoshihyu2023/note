@@ -11485,6 +11485,29 @@ struct Point {
 <span class="boring">}
 </span></code></pre></pre>
 <p>或者使用 <code>unwrap</code>、<code>expect</code>、<code>map</code>、<code>and_then</code> 等方法進行更複雜的處理。這樣的設計使得在Rust中明確處理可能發生的錯誤，避免了在執行階段出現未處理的異常。這也是Rust中的一種推崇錯誤處理的哲學，通過強制使用 <code>Result</code> 類型鼓勵開發者更加關注和處理潛在的錯誤情況。</p>
+<h2 id="模擬-result-列舉"><a class="header" href="#模擬-result-列舉">模擬 Result 列舉</a></h2>
+<pre><pre class="playground"><code class="language-rust">enum _Result&lt;T, E&gt; {
+    Ok(T),
+    Err(E),
+}
+
+fn divide(a: i32, b: i32) -&gt; _Result&lt;i32, &amp;'static str&gt; {
+    if b == 0 {
+        // 如果尝试除以零，则返回一个 Err 变体，包含错误信息
+        _Result::Err(&quot;Cannot divide by zero!&quot;)
+    } else {
+        // 如果成功，返回 Ok 变体，包含结果值
+        _Result::Ok(a / b)
+    }
+}
+
+fn main() {
+    match divide(10, 2) {
+        _Result::Ok(result) =&gt; println!(&quot;Result: {}&quot;, result),
+        _Result::Err(err) =&gt; println!(&quot;Error: {}&quot;, err),
+    }
+}
+</code></pre></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="rust-基本教學"><a class="header" href="#rust-基本教學">Rust 基本教學</a></h1>
 <h2 id="hello-world"><a class="header" href="#hello-world">Hello World!</a></h2>
 <h3 id="不使用管理工具編寫程式"><a class="header" href="#不使用管理工具編寫程式">不使用管理工具編寫程式</a></h3>
@@ -34408,6 +34431,29 @@ struct Point {
 <span class="boring">}
 </span></code></pre></pre>
 <p>或者使用 <code>unwrap</code>、<code>expect</code>、<code>map</code>、<code>and_then</code> 等方法進行更複雜的處理。這樣的設計使得在Rust中明確處理可能發生的錯誤，避免了在執行階段出現未處理的異常。這也是Rust中的一種推崇錯誤處理的哲學，通過強制使用 <code>Result</code> 類型鼓勵開發者更加關注和處理潛在的錯誤情況。</p>
+<h2 id="模擬-result-列舉-1"><a class="header" href="#模擬-result-列舉-1">模擬 Result 列舉</a></h2>
+<pre><pre class="playground"><code class="language-rust">enum _Result&lt;T, E&gt; {
+    Ok(T),
+    Err(E),
+}
+
+fn divide(a: i32, b: i32) -&gt; _Result&lt;i32, &amp;'static str&gt; {
+    if b == 0 {
+        // 如果尝试除以零，则返回一个 Err 变体，包含错误信息
+        _Result::Err(&quot;Cannot divide by zero!&quot;)
+    } else {
+        // 如果成功，返回 Ok 变体，包含结果值
+        _Result::Ok(a / b)
+    }
+}
+
+fn main() {
+    match divide(10, 2) {
+        _Result::Ok(result) =&gt; println!(&quot;Result: {}&quot;, result),
+        _Result::Err(err) =&gt; println!(&quot;Error: {}&quot;, err),
+    }
+}
+</code></pre></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="30-天深入淺出-rust系列"><a class="header" href="#30-天深入淺出-rust系列"><a href="https://ithelp.ithome.com.tw/users/20111802/ironman/1742">30 天深入淺出 Rust</a>系列</a></h1>
 <p>https://ithelp.ithome.com.tw/articles/10199503</p>
 <p>這系列會假設你有基礎的程式能力，不管是什麼語言都行，至少知道一下比如「參考 (reference) 」是什麼，雖說我也會盡量以初學程式的角度講解，只是 Rust 這個語言本身就包含了不少比較進階的觀念，加上我很可能會舉其它程式語言當對照，同時本系列會以類 Unix (Linux, Mac) 的環境為主，如果你使用的是 Windows 大部份情況下應該不會有什麼問題。</p>

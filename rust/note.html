@@ -1559,6 +1559,29 @@ struct Point {
 <span class="boring">}
 </span></code></pre></pre>
 <p>或者使用 <code>unwrap</code>、<code>expect</code>、<code>map</code>、<code>and_then</code> 等方法進行更複雜的處理。這樣的設計使得在Rust中明確處理可能發生的錯誤，避免了在執行階段出現未處理的異常。這也是Rust中的一種推崇錯誤處理的哲學，通過強制使用 <code>Result</code> 類型鼓勵開發者更加關注和處理潛在的錯誤情況。</p>
+<h2 id="模擬-result-列舉"><a class="header" href="#模擬-result-列舉">模擬 Result 列舉</a></h2>
+<pre><pre class="playground"><code class="language-rust">enum _Result&lt;T, E&gt; {
+    Ok(T),
+    Err(E),
+}
+
+fn divide(a: i32, b: i32) -&gt; _Result&lt;i32, &amp;'static str&gt; {
+    if b == 0 {
+        // 如果尝试除以零，则返回一个 Err 变体，包含错误信息
+        _Result::Err(&quot;Cannot divide by zero!&quot;)
+    } else {
+        // 如果成功，返回 Ok 变体，包含结果值
+        _Result::Ok(a / b)
+    }
+}
+
+fn main() {
+    match divide(10, 2) {
+        _Result::Ok(result) =&gt; println!(&quot;Result: {}&quot;, result),
+        _Result::Err(err) =&gt; println!(&quot;Error: {}&quot;, err),
+    }
+}
+</code></pre></pre>
 
                         <script src="https://utteranc.es/client.js"
                             repo="imxood/imxood.github.io"
