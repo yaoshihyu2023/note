@@ -1476,6 +1476,89 @@ fn main() {
 </code></pre></pre>
 <p><code>where</code> 子句的存在讓約束條件更為清晰，有時可以提高代碼的可讀性，特別是當約束條件較長或較複雜時。這種寫法的主要優勢是可以將約束從函數的簽名中分離出來，讓簽名更加簡潔。</p>
 <p>總體而言，<code>where</code> 子句的使用是為了確定泛型參數滿足特定的條件，提高代碼的可讀性和可維護性。</p>
+<h2 id="derivedebug"><a class="header" href="#derivedebug"><code>#[derive(Debug)] </code></a></h2>
+<p>使用 <code>#[derive(Debug)]</code> 時，Rust 編譯器會自動生成一個 <code>Debug</code> trait 的實現。這個生成的實現通常包含一個 <code>fmt::Debug</code> trait 的 <code>fmt</code> 方法，該方法負責將類型的偵錯表示格式化為字串。</p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[derive(Debug)]
+struct Point {
+    x: f64,
+    y: f64,
+}
+<span class="boring">}
+</span></code></pre></pre>
+<p>當你使用 <code>#[derive(Debug)]</code> 註解時，Rust 編譯器會自動生成類似以下的程式碼：</p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>impl std::fmt::Debug for Point {
+    fn fmt(&amp;self, f: &amp;mut std::fmt::Formatter&lt;'_&gt;) -&gt; std::fmt::Result {
+        // 使用 Formatter 将调试信息格式化为字符串
+        f.debug_struct(&quot;Point&quot;)
+            .field(&quot;x&quot;, &amp;self.x)
+            .field(&quot;y&quot;, &amp;self.y)
+            .finish()
+    }
+}
+<span class="boring">}
+</span></code></pre></pre>
+<p>這個生成的實現為 <code>Point</code> 類型實現了 <code>Debug</code> trait 中的 <code>fmt</code> 方法。在這個方法中，使用了 <code>std::fmt::Debug</code> 中提供的 <code>debug_struct</code>、<code>field</code> 和 <code>finish</code> 方法來建構偵錯表示。具體來說：</p>
+<ul>
+<li><code>debug_struct(&quot;Point&quot;)</code> 建立一個名為 &quot;Point&quot; 的偵錯結構體。</li>
+<li><code>field(&quot;x&quot;, &amp;self.x)</code> 新增一個名為 &quot;x&quot; 的欄位，並將 <code>self.x</code> 的偵錯表示新增到結構體中。</li>
+<li><code>field(&quot;y&quot;, &amp;self.y)</code> 同樣新增一個名為 &quot;y&quot; 的欄位，並將 <code>self.y</code> 的偵錯表示新增到結構體中。</li>
+<li><code>finish()</code> 完成結構體的建構，生成最終的偵錯表示。</li>
+</ul>
+<p>這樣，當你使用 <code>println!</code> 宏並使用 <code>{:?}</code> 預留位置列印 <code>Point</code> 類型的實例時，編譯器自動生成的 <code>Debug</code> trait 實現將被呼叫，輸出類似於 <code>Point { x: 3.0, y: 4.0 }</code> 的偵錯資訊。這種自動生成的實現簡化了偵錯過程，使得偵錯資訊更加易讀和友好。</p>
+<h2 id="result"><a class="header" href="#result">Result</a></h2>
+<p><code>Result</code> 是一個列舉類型，用於表示函數執行的結果，特別是可能發生錯誤的情況。<code>Result</code> 的定義如下：</p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>enum Result&lt;T, E&gt; {
+    Ok(T),
+    Err(E),
+}
+<span class="boring">}
+</span></code></pre></pre>
+<p>這裡有兩個變數，<code>T</code> 和 <code>E</code>。<code>T</code> 代表成功時返回的值的類型，而 <code>E</code> 代表錯誤時返回的值的類型。<code>Result</code> 列舉有兩個變體：</p>
+<ol>
+<li><code>Ok(T)</code>: 表示操作成功，包含一個成功時返回的值 <code>T</code>。</li>
+<li><code>Err(E)</code>: 表示操作發生錯誤，包含一個錯誤時返回的值 <code>E</code>。</li>
+</ol>
+<p>例如，一個函數可能返回 <code>Result</code> 類型來表示執行結果：</p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>fn divide(a: i32, b: i32) -&gt; Result&lt;i32, &amp;'static str&gt; {
+    if b == 0 {
+        // 如果尝试除以零，则返回一个 Err 变体，包含错误信息
+        Err(&quot;Cannot divide by zero!&quot;)
+    } else {
+        // 如果成功，返回 Ok 变体，包含结果值
+        Ok(a / b)
+    }
+}
+<span class="boring">}
+</span></code></pre></pre>
+<p><code>Result&lt;i32, &amp;'static str&gt;</code> 是一個 <code>Result</code> 類型的實例，表示可能返回一個整數（<code>i32</code>類型）的成功結果，或者返回一個靜態字串切片（<code>&amp;'static str</code>類型）的錯誤資訊。</p>
+<p>讓我們詳細解釋這個類型：</p>
+<ul>
+<li><code>Result</code>: 這是Rust標準庫中的列舉類型，用於表示操作的結果，可以是成功的值（<code>Ok</code>變體）或錯誤的值（<code>Err</code>變體）。</li>
+<li><code>&lt;i32, &amp;'static str&gt;</code>: 這是 <code>Result</code> 的兩個類型參數。第一個參數 <code>i32</code> 表示成功時返回的值的類型，第二個參數 <code>&amp;'static str</code> 表示錯誤時返回的值的類型。<code>&amp;'static str</code> 是一個指向靜態字串切片的引用，通常用於表示在整個程序生命週期中都有效的字串。</li>
+</ul>
+<p>在使用 <code>Result</code> 類型時，通常會使用模式匹配（pattern matching）或 <code>Result</code> 的方法來處理操作的成功和失敗情況。例如：</p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>match divide(10, 2) {
+    Ok(result) =&gt; println!(&quot;Result: {}&quot;, result),
+    Err(err) =&gt; println!(&quot;Error: {}&quot;, err),
+}
+<span class="boring">}
+</span></code></pre></pre>
+<p>或者使用 <code>unwrap</code>、<code>expect</code>、<code>map</code>、<code>and_then</code> 等方法進行更複雜的處理。這樣的設計使得在Rust中明確處理可能發生的錯誤，避免了在執行階段出現未處理的異常。這也是Rust中的一種推崇錯誤處理的哲學，通過強制使用 <code>Result</code> 類型鼓勵開發者更加關注和處理潛在的錯誤情況。</p>
 
                         <script src="https://utteranc.es/client.js"
                             repo="imxood/imxood.github.io"
